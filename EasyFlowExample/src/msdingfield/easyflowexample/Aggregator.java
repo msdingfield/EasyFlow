@@ -17,7 +17,7 @@ import msdingfield.easyflow.execution.Task;
 import msdingfield.easyflow.graph.FlowGraph;
 import msdingfield.easyflow.graph.FlowGraphTaskBuilder;
 import msdingfield.easyflow.reflect.ClassOperationFlowNode;
-import msdingfield.easyflow.reflect.ClassPathScannerFlowGraphBuilder;
+import msdingfield.easyflow.reflect.ClassPathScannerClassOperationBuilder;
 import msdingfield.easyflow.reflect.ClassOperation;
 import msdingfield.easyflow.reflect.ClassOperationTaskFactory;
 import msdingfield.easyflow.reflect.Context;
@@ -205,7 +205,7 @@ public class Aggregator {
 	}
 
 	public static void show(final String clientId) throws InterruptedException {
-		final List<ClassOperation> operations = ClassPathScannerFlowGraphBuilder.loadOperationsOnClasspath("msdingfield.easyflowexample", "equities");
+		final List<ClassOperation> operations = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflowexample", "equities");
 		final FlowGraph<ClassOperationFlowNode> system = new FlowGraph<ClassOperationFlowNode>(Sets.newHashSet(Lists.transform(operations, new Function<ClassOperation, ClassOperationFlowNode>(){
 			@Override public ClassOperationFlowNode apply(ClassOperation arg0) {
 				return new ClassOperationFlowNode(arg0);

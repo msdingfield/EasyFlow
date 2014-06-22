@@ -10,13 +10,33 @@ import msdingfield.easyflow.annotations.Scope;
 
 import com.google.common.collect.Lists;
 
-public class ClassPathScannerFlowGraphBuilder {
+/** Helpers for scanning the class path for ClassOperations.
+ * 
+ * This class uses its own class loader and assumes it was loaded with a 
+ * URLClassLoader implementation.
+ * 
+ * @author Matt
+ *
+ */
+public class ClassPathScannerClassOperationBuilder {
 
+	/**
+	 * Look for ClassOperations within the given package.
+	 * 
+	 * This limits excludes classes not annotated with the requested scope.
+	 * 
+	 * This will search for top level and static inner classes.  Class must 
+	 * have @Scope annotation and have one method with @Operation annotation.
+	 * 
+	 * @param basePkg Java package to scan.
+	 * @param scope The scope to load.
+	 * @return List of ClassOperations.
+	 */
 	public static List<ClassOperation> loadOperationsOnClasspath(
 			final String basePkg, final String scope) {
 		final List<ClassOperation> operations = Lists.newArrayList();
 	
-		final URLClassLoader classLoader = (URLClassLoader) ClassPathScannerFlowGraphBuilder.class.getClassLoader();
+		final URLClassLoader classLoader = (URLClassLoader) ClassPathScannerClassOperationBuilder.class.getClassLoader();
 		loadFrom(ClassScanner.from(classLoader, basePkg), scope, operations);
 		return operations;
 	}
@@ -26,7 +46,7 @@ public class ClassPathScannerFlowGraphBuilder {
 		for (final Class<?> type : scanner) {
 			loadFrom(ClassScanner.from(type), scope, operations);
 			
-			if (isStaticClass(type) && isInScope(type, scope) && ClassPathScannerFlowGraphBuilder.isAnnotatedOperationClass(type)) {
+			if (isStaticClass(type) && isInScope(type, scope) && ClassPathScannerClassOperationBuilder.isAnnotatedOperationClass(type)) {
 				final ClassOperation op = AnnotationClassOperationBuilder.fromClass(type);
 				operations.add(op);
 			}

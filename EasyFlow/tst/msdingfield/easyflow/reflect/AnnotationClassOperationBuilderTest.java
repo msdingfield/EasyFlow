@@ -13,7 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class AnnotationBuilderTest {
+public class AnnotationClassOperationBuilderTest {
 	
 	@Rule
 	public TestExecutor executor = new TestExecutor();
