@@ -9,6 +9,15 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+/**
+ * FlowNode implemented in terms of ClassOperation.
+ * 
+ * This class adapts a ClassOperation so that dependencies among 
+ * ClassOperations can be analyzed using the FlowGraph class.
+ * 
+ * @author Matt
+ *
+ */
 public class ClassOperationFlowNode implements FlowNode {
 	private final ClassOperation op;
 	
@@ -30,7 +39,7 @@ public class ClassOperationFlowNode implements FlowNode {
 	@Override
 	public Set<String> getOutputs() {
 		final Set<String> outputs = Sets.newHashSet();
-		for (final OperationInputPort getter : op.getOutputs()) {
+		for (final OperationOutputPort getter : op.getOutputs()) {
 			outputs.add(getter.getName());
 		}
 		return outputs;
@@ -39,7 +48,7 @@ public class ClassOperationFlowNode implements FlowNode {
 	@Override
 	public Set<String> getInputs() {
 		final Set<String> inputPorts = Sets.newHashSet();
-		for (final OperationOutputPort setter : op.getInputs()) {
+		for (final OperationInputPort setter : op.getInputs()) {
 			inputPorts.add(setter.getName());
 		}
 		return inputPorts;
@@ -47,5 +56,36 @@ public class ClassOperationFlowNode implements FlowNode {
 
 	public ClassOperation getOp() {
 		return op;
+	}
+
+	@Override
+	public String toString() {
+		return "ClassOperationFlowNode [op=" + op + ", getOutputs()="
+				+ getOutputs() + ", getInputs()=" + getInputs() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((op == null) ? 0 : op.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClassOperationFlowNode other = (ClassOperationFlowNode) obj;
+		if (op == null) {
+			if (other.op != null)
+				return false;
+		} else if (!op.equals(other.op))
+			return false;
+		return true;
 	}
 }

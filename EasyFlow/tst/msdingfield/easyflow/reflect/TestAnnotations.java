@@ -30,7 +30,7 @@ public class TestAnnotations {
 		
 		FlowGraphTaskBuilder
 		.graph(graph)
-		.taskFactory(ClassOperationTaskFactory.get(context))
+		.taskFactory(new ClassOperationTaskFactory(context))
 		.build()
 		.schedule().waitForCompletion();
 		

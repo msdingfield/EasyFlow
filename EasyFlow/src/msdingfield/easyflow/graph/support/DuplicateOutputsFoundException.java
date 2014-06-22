@@ -1,8 +1,6 @@
-package msdingfield.easyflow.graph;
+package msdingfield.easyflow.graph.support;
 
-/** Exception thrown when the same output name is used by more than one 
- * operation within the same system.
- */
+/** Exception thrown when multiple FlowNodes produce the same output. */
 public class DuplicateOutputsFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = -8474909123067668232L;

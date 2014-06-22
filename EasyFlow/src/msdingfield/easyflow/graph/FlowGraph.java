@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import msdingfield.easyflow.graph.support.DuplicateOutputsFoundException;
 import msdingfield.easyflow.graph.support.NodeNotFoundException;
 import msdingfield.easyflow.graph.support.OutputNotFoundException;
 import msdingfield.easyflow.support.CyclicDependencyException;

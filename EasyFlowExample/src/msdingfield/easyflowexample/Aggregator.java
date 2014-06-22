@@ -214,7 +214,7 @@ public class Aggregator {
 		context.putPortValue("clientId", clientId);
 		FlowGraphTaskBuilder
 			.graph(system)
-			.taskFactory(ClassOperationTaskFactory.get(context))
+			.taskFactory(new ClassOperationTaskFactory(context))
 			.build()
 			.schedule()
 			.waitForCompletion();

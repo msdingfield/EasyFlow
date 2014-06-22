@@ -2,29 +2,36 @@ package msdingfield.easyflow.reflect;
 
 import java.lang.reflect.Field;
 
-import msdingfield.easyflow.annotations.Input;
-import msdingfield.easyflow.annotations.ForkOn;
+import msdingfield.easyflow.annotations.Aggregate;
+import msdingfield.easyflow.annotations.Output;
 
 public class FieldOperationOutputPort extends FieldOperationPort implements OperationOutputPort {
-	
+
 	public FieldOperationOutputPort(final Field field) {
 		super(field);
 	}
 	
 	@Override
-	public void set(final Object instance, final Object value) throws IllegalArgumentException, IllegalAccessException {
-		field.set(instance, value);
+	public Object get(final Object instance) throws IllegalArgumentException, IllegalAccessException {
+		return field.get(instance);
 	}
 
 	@Override
-	public boolean fork() {
-		return field.isAnnotationPresent(ForkOn.class);
+	public boolean aggregate() {
+		return field.isAnnotationPresent(Aggregate.class);
 	}
 
 	@Override
 	public String getName() {
-		final Input input = field.getAnnotation(Input.class);
-		final String port = input.port();
+		final Output output = field.getAnnotation(Output.class);
+		final String port = output.port();
 		return port == null || "".equals(port) ? getFieldName() : port;
 	}
+
+	@Override
+	public String toString() {
+		return "FieldOperationOutputPort [field=" + field + ", aggregate()="
+				+ aggregate() + ", getName()=" + getName();
+	}
+
 }

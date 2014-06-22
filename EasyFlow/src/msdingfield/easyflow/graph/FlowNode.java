@@ -2,15 +2,11 @@ package msdingfield.easyflow.graph;
 
 import java.util.Set;
 
-/** An operation to be performed.
+/** A node in a directed graph.
  * 
- * Operations have a set of inputs and a set of outputs.  All of the inputs 
- * must be available before the operation can execute.  Upon completion, all
- * outputs must have a value.
- * 
- * The inputs must be of a compatible type or evaluation will fail.
- * 
- * Not that this class is immutable.
+ * Rather than representing a graph with adjacency lists or matrices, a graph
+ * is represented with named edges.  Each node holds a set of names of incoming
+ * edges and a set of names of outgoing edges.
  * 
  * @author Matt
  *

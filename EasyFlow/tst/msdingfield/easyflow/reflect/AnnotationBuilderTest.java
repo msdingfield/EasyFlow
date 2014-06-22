@@ -6,6 +6,7 @@ import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Output;
 import msdingfield.easyflow.execution.Task;
+import msdingfield.easyflow.reflect.support.InvalidOperationBindingException;
 import msdingfield.easyflow.testsupport.TestExecutor;
 
 import org.junit.Rule;
@@ -72,7 +73,7 @@ public class AnnotationBuilderTest {
 	
 	@Test
 	public void testNoOperationAnnotation() {
-		exception.expect(MissingOperationException.class);
+		exception.expect(InvalidOperationBindingException.class);
 		AnnotationClassOperationBuilder.fromClass(NoOperation.class);
 	}
 	
