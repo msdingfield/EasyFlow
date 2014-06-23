@@ -22,7 +22,7 @@ public class GatherTest {
 	public static class Producer1 {
 		
 		@Aggregate
-		@Output(port="names")
+		@Output(connectedEdgeName="names")
 		public String name;
 		
 		@Operation
@@ -33,7 +33,7 @@ public class GatherTest {
 	
 	public static class Producer2 {
 		@Aggregate
-		@Output(port="names")
+		@Output(connectedEdgeName="names")
 		public String name;
 		
 		@Operation
@@ -56,7 +56,7 @@ public class GatherTest {
 		task2.schedule();
 		task2.waitForCompletion();
 		@SuppressWarnings("unchecked")
-		final Collection<String> names = (Collection<String>) context.getPortValue("names");
+		final Collection<String> names = (Collection<String>) context.getEdgeValue("names");
 		assertEquals(2, names.size());
 		assertTrue(names.contains("Producer1"));
 		assertTrue(names.contains("Producer2"));

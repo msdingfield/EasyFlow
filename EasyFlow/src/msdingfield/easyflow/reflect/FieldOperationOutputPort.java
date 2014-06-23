@@ -5,8 +5,15 @@ import java.lang.reflect.Field;
 import msdingfield.easyflow.annotations.Aggregate;
 import msdingfield.easyflow.annotations.Output;
 
+/**
+ * OperationOutputPort implementation for java.lang.reflect.Field properties.
+ * 
+ * @author Matt
+ *
+ */
 public class FieldOperationOutputPort extends FieldOperationPort implements OperationOutputPort {
 
+	/** Wrap a Field. */
 	public FieldOperationOutputPort(final Field field) {
 		super(field);
 	}
@@ -22,16 +29,20 @@ public class FieldOperationOutputPort extends FieldOperationPort implements Oper
 	}
 
 	@Override
-	public String getName() {
+	public String getConnectedEdgeName() {
 		final Output output = field.getAnnotation(Output.class);
-		final String port = output.port();
-		return port == null || "".equals(port) ? getFieldName() : port;
+		if (output == null) {
+			return getFieldName();
+		} else {
+			final String port = output.connectedEdgeName();
+			return port == null || "".equals(port) ? getFieldName() : port;
+		}
 	}
 
 	@Override
 	public String toString() {
 		return "FieldOperationOutputPort [field=" + field + ", aggregate()="
-				+ aggregate() + ", getName()=" + getName();
+				+ aggregate() + ", getName()=" + getConnectedEdgeName();
 	}
 
 }

@@ -75,12 +75,12 @@ public class ClassOperation {
 	public void before(final Context context) {
 		try {
 			final List<Object> instances = Lists.newArrayList();
-			context.putPortValue(operationClass, instances);
+			context.setStateValue(operationClass, instances);
 			final OperationInputPort forkOn = getForkList(context);
 			if (forkOn == null) {
 				newInstance(context, instances);
 			} else {
-				final Object forkValue = context.getPortValue(forkOn.getName());
+				final Object forkValue = context.getEdgeValue(forkOn.getConnectedEdgeName());
 				forkInit(context, forkValue, forkOn, instances);
 			}
 		} catch (Exception e) {
@@ -97,7 +97,7 @@ public class ClassOperation {
 	public void execute(final Context context) {
 		try {
 			@SuppressWarnings("unchecked")
-			final Collection<Object> instances = (Collection<Object>) context.getPortValue(operationClass);
+			final Collection<Object> instances = (Collection<Object>) context.getStateValue(operationClass);
 			for (final Object instance : instances) {
 				Task.fork(new Runnable(){
 					@Override public void run() {
@@ -125,7 +125,7 @@ public class ClassOperation {
 	public void after(final Context context) {
 		try {
 			@SuppressWarnings("unchecked")
-			final Collection<Object> instances = (Collection<Object>)context.getPortValue(operationClass);
+			final Collection<Object> instances = (Collection<Object>)context.getStateValue(operationClass);
 			for (final Object instance : instances) {
 				saveOutputsToContext(context, instance, null != getForkList(context));
 			}
@@ -186,7 +186,7 @@ public class ClassOperation {
 			final Object instance, final OperationInputPort setter)
 			throws IllegalAccessException {
 		
-		final Object attribute = context.getPortValue(setter.getName());
+		final Object attribute = context.getEdgeValue(setter.getConnectedEdgeName());
 		setInput(instance, setter, attribute);
 	}
 
@@ -246,16 +246,16 @@ public class ClassOperation {
 			final Object instance, final boolean gatherAll) throws IllegalAccessException {
 		for (final OperationOutputPort getter : outputs) {
 			if (getter.aggregate()) {
-				Collection<Object> values = getOrCreateCollection(context, getter.getName());
+				Collection<Object> values = getOrCreateCollection(context, getter.getConnectedEdgeName());
 				final Object value = getter.get(instance);
 				values.add(value);
 			} else if(gatherAll) {
-				Collection<Object> values = getOrCreateCollection(context, getter.getName());
+				Collection<Object> values = getOrCreateCollection(context, getter.getConnectedEdgeName());
 				final Object value = getter.get(instance);
 				values.add(value);
 			} else {
 				final Object value = getter.get(instance);
-				context.putPortValue(getter.getName(), value);
+				context.setEdgeValue(getter.getConnectedEdgeName(), value);
 			}
 		}
 	}
@@ -263,10 +263,10 @@ public class ClassOperation {
 	private Collection<Object> getOrCreateCollection(final Context context, final String name) {
 		synchronized (context) {
 			@SuppressWarnings("unchecked")
-			Collection<Object> values = (Collection<Object>) context.getPortValue(name);
+			Collection<Object> values = (Collection<Object>) context.getEdgeValue(name);
 			if (values == null) {
 				values = new Aggregation<Object>();
-				context.putPortValue(name, values);
+				context.setEdgeValue(name, values);
 			}
 			return values;	
 		}

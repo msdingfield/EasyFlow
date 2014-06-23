@@ -57,11 +57,11 @@ public class Aggregator {
 		private StockQuoteDao dao = new StockQuoteDao();
 		
 		@ForkOn
-		@Input(port="portfolioSymbols")
+		@Input(connectedEdgeName="portfolioSymbols")
 		public String portfolioSymbol;
 		
 		@Aggregate
-		@Output(port="portfolioQuotes")
+		@Output(connectedEdgeName="portfolioQuotes")
 		public ListenableFuture<StockQuote> portfolioQuote;
 		
 		@Operation
@@ -78,11 +78,11 @@ public class Aggregator {
 		public String clientId;
 		
 		@ForkOn
-		@Input(port="portfolioSymbols")
+		@Input(connectedEdgeName="portfolioSymbols")
 		public String portfolioSymbol;
 		
 		@Aggregate
-		@Output(port="portfolioBalances")
+		@Output(connectedEdgeName="portfolioBalances")
 		public StockBalance portfolioBalance; 
 		
 		@Operation
@@ -122,11 +122,11 @@ public class Aggregator {
 		private StockQuoteDao dao = new StockQuoteDao();
 		
 		@ForkOn
-		@Input(port="viewedSymbols")
+		@Input(connectedEdgeName="viewedSymbols")
 		public String viewedSymbol;
 		
 		@Aggregate
-		@Output(port="viewedQuotes")
+		@Output(connectedEdgeName="viewedQuotes")
 		public ListenableFuture<StockQuote> viewedQuote;
 		
 		@Operation
@@ -211,7 +211,7 @@ public class Aggregator {
 				return new ClassOperationFlowNode(arg0);
 			}})));
 		final Context context = new Context();
-		context.putPortValue("clientId", clientId);
+		context.setEdgeValue("clientId", clientId);
 		FlowGraphTaskBuilder
 			.graph(system)
 			.taskFactory(new ClassOperationTaskFactory(context))

@@ -34,7 +34,7 @@ public class AnnotationClassOperationBuilderTest {
 		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OneOutput.class);
 		assertTrue(op.getInputs().isEmpty());
 		assertEquals(1, op.getOutputs().size());
-		assertEquals("output", op.getOutputs().iterator().next().getName());
+		assertEquals("output", op.getOutputs().iterator().next().getConnectedEdgeName());
 		assertEquals(int.class, op.getOutputs().iterator().next().getType());
 	}
 
@@ -43,7 +43,7 @@ public class AnnotationClassOperationBuilderTest {
 		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OneInput.class);
 		assertTrue(op.getOutputs().isEmpty());
 		assertEquals(1, op.getInputs().size());
-		assertEquals("input", op.getInputs().iterator().next().getName());
+		assertEquals("input", op.getInputs().iterator().next().getConnectedEdgeName());
 		assertEquals(int.class, op.getInputs().iterator().next().getType());
 	}
 	
@@ -70,7 +70,7 @@ public class AnnotationClassOperationBuilderTest {
 
 	private static <T extends OperationPort> T getPort(final Collection<T> ports, final String name) {
 		for (final T port : ports) {
-			if (name.equals(port.getName())) {
+			if (name.equals(port.getConnectedEdgeName())) {
 				return port;
 			}
 		}

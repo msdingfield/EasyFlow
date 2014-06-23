@@ -25,7 +25,7 @@ public class ScatterGatherTest {
 	public static class ScatterGatherOperation {
 
 		@ForkOn
-		@Input(port="numbers")
+		@Input(connectedEdgeName="numbers")
 		public String number;
 		
 		@Output
@@ -41,13 +41,13 @@ public class ScatterGatherTest {
 	public void test() throws InterruptedException {
 		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterGatherOperation.class);
 		final Context context = new Context();
-		context.putPortValue("numbers", Lists.newArrayList("8", "3", "6"));
+		context.setEdgeValue("numbers", Lists.newArrayList("8", "3", "6"));
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);
 		task.schedule();
 		task.waitForCompletion();
 		
 		@SuppressWarnings("unchecked")
-		final Collection<Integer> integers = (Collection<Integer>) context.getPortValue("integer");
+		final Collection<Integer> integers = (Collection<Integer>) context.getEdgeValue("integer");
 		assertEquals(3, integers.size());
 		assertTrue(integers.contains(3));
 		assertTrue(integers.contains(6));

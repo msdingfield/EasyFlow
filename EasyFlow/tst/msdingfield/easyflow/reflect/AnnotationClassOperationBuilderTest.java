@@ -99,7 +99,7 @@ public class AnnotationClassOperationBuilderTest {
 		assertTrue(node.getInputs().contains("myInput"));
 		
 		final Context context = new Context();
-		context.putPortValue("myInput", "foobar");
+		context.setEdgeValue("myInput", "foobar");
 		OperationWithInputAttribute.receivedInput = "";
 		runOperation(op, context);
 		assertEquals("foobar", OperationWithInputAttribute.receivedInput);
@@ -116,7 +116,7 @@ public class AnnotationClassOperationBuilderTest {
 		
 		final Context context = new Context();
 		runOperation(op, context);
-		assertEquals("foobar", context.getPortValue("myOutput"));
+		assertEquals("foobar", context.getEdgeValue("myOutput"));
 	}
 
 	@Test
@@ -131,9 +131,9 @@ public class AnnotationClassOperationBuilderTest {
 		assertTrue(node.getOutputs().contains("myOutput"));
 		
 		final Context context = new Context();
-		context.putPortValue("myInput", "raboof");
+		context.setEdgeValue("myInput", "raboof");
 		runOperation(op, context);
-		assertEquals("raboof", context.getPortValue("myOutput"));
+		assertEquals("raboof", context.getEdgeValue("myOutput"));
 	}
 
 	private void runOperation(final ClassOperation op, final Context context) {

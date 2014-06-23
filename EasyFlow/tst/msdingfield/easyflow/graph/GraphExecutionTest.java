@@ -137,17 +137,17 @@ public class GraphExecutionTest {
 	public void test() throws InterruptedException {
 		final FlowGraph<AddOperation> graph = new FlowGraph<AddOperation>(params.ops);
 		
-		context.putPortValue(params.inputKey, params.inputValue);
+		context.setEdgeValue(params.inputKey, params.inputValue);
 		FlowGraphTaskBuilder
 		.graph(graph)
 		.taskFactory(AddOperation.getTaskFactory(context))
 		.build()
 		.schedule().waitForCompletion();
 		
-		assertEquals(params.aValue, context.getPortValue("a"));
-		assertEquals(params.b1Value, context.getPortValue("b.1"));
-		assertEquals(params.b2Value, context.getPortValue("b.2"));
-		assertEquals(params.cValue, context.getPortValue("c"));
+		assertEquals(params.aValue, context.getEdgeValue("a"));
+		assertEquals(params.b1Value, context.getEdgeValue("b.1"));
+		assertEquals(params.b2Value, context.getEdgeValue("b.2"));
+		assertEquals(params.cValue, context.getEdgeValue("c"));
 	}
 	
 	public static final class AddOperationTaskFactory implements TaskFactory<AddOperation> {

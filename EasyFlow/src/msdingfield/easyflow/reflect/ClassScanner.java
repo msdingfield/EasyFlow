@@ -8,20 +8,43 @@ import java.util.Set;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
+/**
+ * Helper for iterating over all classes, including inner classes, found on the
+ * classpath.
+ * 
+ * Instances of Iterable are return for convenient use in for() statements.
+ * 
+ * @author Matt
+ *
+ */
 public final class ClassScanner {
 	private ClassScanner() {}
 	
-	public static Iterable<Class<?>> from(final URLClassLoader loader, final String packageName) {
-		return new ClassPathScanner(loader, packageName);
+	/** 
+	 * Return an Iterable for all top-level classes within a given Java 
+	 * package, including sub-packages.
+	 * 
+	 * @param classLoader The classLoader to scan.
+	 * @param packageName The java package to scan.
+	 * @return An Iterable<Class> instance which will return matching classes.
+	 */
+	public static Iterable<Class<?>> from(final URLClassLoader classLoader, final String packageName) {
+		return new TopLevelClassIterable(classLoader, packageName);
 	}
 
+	/**
+	 * Return an Iterable for all inner classes of the given class.
+	 * 
+	 * @param type The class to scan.
+	 * @return An Iterable<Class> instance which will return matching classes.
+	 */
 	public static Iterable<Class<?>> from(Class<?> type) {
-		return new NestedClassScanner(type);
+		return new InnerClassIterable(type);
 	}
 	
-	public static class NestedClassScanner implements Iterable<Class<?>> {
+	private static class InnerClassIterable implements Iterable<Class<?>> {
 		private final Class<?> outerClass;
-		public NestedClassScanner(final Class<?> outerClass) {
+		public InnerClassIterable(final Class<?> outerClass) {
 			this.outerClass = outerClass;
 		}
 		
@@ -60,16 +83,11 @@ public final class ClassScanner {
 		}
 	}
 
-	public static class ClassPathScanner implements Iterable<Class<?>> {
+	private static class TopLevelClassIterable implements Iterable<Class<?>> {
 		private final ClassLoader loader;
 		private final String packageName;
 		
-		public ClassPathScanner(final URLClassLoader loader) {
-			this.loader = loader;
-			this.packageName = null;
-		}
-	
-		public ClassPathScanner(final URLClassLoader loader, final String packageName) {
+		public TopLevelClassIterable(final URLClassLoader loader, final String packageName) {
 			this.loader = loader;
 			this.packageName = packageName;
 		}

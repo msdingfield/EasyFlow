@@ -17,9 +17,9 @@ public class ClassOperationTaskFactoryTest {
 		final ClassOperationTaskFactory factory = new ClassOperationTaskFactory(context);
 		final Task task = factory.create(DefaultExecutor.get(), ClassOperationFlowNode.toFlowNode(AnnotationClassOperationBuilder.fromClass(TestOp.class)));
 		
-		context.putPortValue("input", 3);
+		context.setEdgeValue("input", 3);
 		task.schedule().waitForCompletion();
-		final int output = (int) context.getPortValue("output");
+		final int output = (int) context.getEdgeValue("output");
 		assertEquals(6, output);
 	}
 	

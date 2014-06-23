@@ -5,8 +5,15 @@ import java.lang.reflect.Field;
 import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.ForkOn;
 
+/**
+ * OperationInputPort implementation for java.lang.reflect.Field properties.
+ * 
+ * @author Matt
+ *
+ */
 public class FieldOperationInputPort extends FieldOperationPort implements OperationInputPort {
 	
+	/** Wrap a Field. */
 	public FieldOperationInputPort(final Field field) {
 		super(field);
 	}
@@ -22,9 +29,13 @@ public class FieldOperationInputPort extends FieldOperationPort implements Opera
 	}
 
 	@Override
-	public String getName() {
+	public String getConnectedEdgeName() {
 		final Input input = field.getAnnotation(Input.class);
-		final String port = input.port();
-		return port == null || "".equals(port) ? getFieldName() : port;
+		if (input == null) {
+			return getFieldName();
+		} else {
+			final String explicitEdgeName = input.connectedEdgeName();
+			return explicitEdgeName == null || "".equals(explicitEdgeName) ? getFieldName() : explicitEdgeName;
+		}
 	}
 }

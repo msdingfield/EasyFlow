@@ -40,7 +40,7 @@ public class ClassOperationFlowNode implements FlowNode {
 	public Set<String> getOutputs() {
 		final Set<String> outputs = Sets.newHashSet();
 		for (final OperationOutputPort getter : op.getOutputs()) {
-			outputs.add(getter.getName());
+			outputs.add(getter.getConnectedEdgeName());
 		}
 		return outputs;
 	}
@@ -49,7 +49,7 @@ public class ClassOperationFlowNode implements FlowNode {
 	public Set<String> getInputs() {
 		final Set<String> inputPorts = Sets.newHashSet();
 		for (final OperationInputPort setter : op.getInputs()) {
-			inputPorts.add(setter.getName());
+			inputPorts.add(setter.getConnectedEdgeName());
 		}
 		return inputPorts;
 	}

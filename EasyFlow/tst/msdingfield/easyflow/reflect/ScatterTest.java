@@ -27,7 +27,7 @@ public class ScatterTest {
 		public Map<Integer,String> mapping;
 
 		@ForkOn
-		@Input(port="numbers")
+		@Input(connectedEdgeName="numbers")
 		public String number;
 		
 		@Operation
@@ -42,8 +42,8 @@ public class ScatterTest {
 		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterOperation.class);
 		final Context context = new Context();
 		final HashMap<Integer, String> mapping = new HashMap<Integer,String>();
-		context.putPortValue("mapping", mapping);
-		context.putPortValue("numbers", Lists.newArrayList("8", "3", "6"));
+		context.setEdgeValue("mapping", mapping);
+		context.setEdgeValue("numbers", Lists.newArrayList("8", "3", "6"));
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);
 		task.schedule();
 		task.waitForCompletion();

@@ -51,10 +51,10 @@ public final class AddOperation implements FlowNode {
 			System.out.printf("start %s\n", name);
 			int acc = constant;
 			for (final String input : getInputs()) {
-				if (!context.isPortSet(input)) {
+				if (!context.isEdgeSet(input)) {
 					throw new RuntimeException("Missing input");
 				}
-				final Object ob = context.getPortValue(input);
+				final Object ob = context.getEdgeValue(input);
 				
 				if (ob instanceof Integer) {
 					acc += (Integer)ob;
@@ -62,7 +62,7 @@ public final class AddOperation implements FlowNode {
 			}
 			
 			for (final String output : getOutputs()) {
-				context.putPortValue(output, (Integer)acc);
+				context.setEdgeValue(output, (Integer)acc);
 			}
 			try { Thread.sleep(100L); } catch (Exception e) {}
 		} finally {

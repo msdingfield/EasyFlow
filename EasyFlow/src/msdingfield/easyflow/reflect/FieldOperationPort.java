@@ -2,9 +2,13 @@ package msdingfield.easyflow.reflect;
 
 import java.lang.reflect.Field;
 
+/** A base class for Input and Output port implementations. */
 public abstract class FieldOperationPort implements OperationPort {
 
+	/** The Field we are wrapping. */
 	protected final Field field;
+	
+	/** For use by concrete implementations.  Wraps a field. */
 	protected FieldOperationPort(final Field field) {
 		this.field = field;
 	}
@@ -14,12 +18,17 @@ public abstract class FieldOperationPort implements OperationPort {
 		return field.getType();
 	}
 
+	/** Get the name of the field. */
 	public String getFieldName() {
 		return field.getName();
 	}
 	
+	/**
+	 * Returns the name of the edge to which this port is connected.
+	 * Typically the edge and port will share the same name.
+	 */
 	@Override
-	public abstract String getName();
+	public abstract String getConnectedEdgeName();
 
 	@Override
 	public int hashCode() {

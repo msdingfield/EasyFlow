@@ -55,6 +55,6 @@ public class FutureUnpackingTest {
 		task2.schedule();
 		task2.waitForCompletion();
 		
-		assertEquals("Yo", context.getPortValue("decodedMessage"));
+		assertEquals("Yo", context.getEdgeValue("decodedMessage"));
 	}
 }
