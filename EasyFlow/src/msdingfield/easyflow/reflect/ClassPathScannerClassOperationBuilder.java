@@ -32,9 +32,9 @@ public class ClassPathScannerClassOperationBuilder {
 	 * @param scope The scope to load.
 	 * @return List of ClassOperations.
 	 */
-	public static List<ClassOperation> loadOperationsOnClasspath(
+	public static List<ClassOperationProxy> loadOperationsOnClasspath(
 			final String basePkg, final String scope) {
-		final List<ClassOperation> operations = Lists.newArrayList();
+		final List<ClassOperationProxy> operations = Lists.newArrayList();
 	
 		final URLClassLoader classLoader = (URLClassLoader) ClassPathScannerClassOperationBuilder.class.getClassLoader();
 		loadFrom(ClassScanner.from(classLoader, basePkg), scope, operations);
@@ -42,12 +42,12 @@ public class ClassPathScannerClassOperationBuilder {
 	}
 	
 	private static void loadFrom(final Iterable<Class<?>> scanner, final String scope,
-			final List<ClassOperation> operations) {
+			final List<ClassOperationProxy> operations) {
 		for (final Class<?> type : scanner) {
 			loadFrom(ClassScanner.from(type), scope, operations);
 			
 			if (isStaticClass(type) && isInScope(type, scope) && ClassPathScannerClassOperationBuilder.isAnnotatedOperationClass(type)) {
-				final ClassOperation op = AnnotationClassOperationBuilder.fromClass(type);
+				final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(type);
 				operations.add(op);
 			}
 		}

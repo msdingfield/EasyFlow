@@ -19,20 +19,20 @@ import com.google.common.collect.Sets;
  *
  */
 public class ClassOperationFlowNode implements FlowNode {
-	private final ClassOperation op;
+	private final ClassOperationProxy op;
 	
-	public static ClassOperationFlowNode toFlowNode(final ClassOperation op) {
+	public static ClassOperationFlowNode toFlowNode(final ClassOperationProxy op) {
 		return new ClassOperationFlowNode(op);
 	}
 	
-	public static List<ClassOperationFlowNode> toFlowNodes(final List<ClassOperation> ops) {
-		return Lists.transform(ops, new Function<ClassOperation, ClassOperationFlowNode>(){
-			@Override public ClassOperationFlowNode apply(ClassOperation arg0) {
+	public static List<ClassOperationFlowNode> toFlowNodes(final List<ClassOperationProxy> ops) {
+		return Lists.transform(ops, new Function<ClassOperationProxy, ClassOperationFlowNode>(){
+			@Override public ClassOperationFlowNode apply(ClassOperationProxy arg0) {
 				return toFlowNode(arg0);
 			}});
 	}
 	
-	public ClassOperationFlowNode(final ClassOperation op) {
+	public ClassOperationFlowNode(final ClassOperationProxy op) {
 		this.op = op;
 	}
 	
@@ -54,7 +54,7 @@ public class ClassOperationFlowNode implements FlowNode {
 		return inputPorts;
 	}
 
-	public ClassOperation getOp() {
+	public ClassOperationProxy getOp() {
 		return op;
 	}
 

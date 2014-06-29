@@ -38,7 +38,7 @@ public class ClassOperationTaskFactory implements TaskFactory<ClassOperationFlow
 	 * @param context The Context instance which will hold intermediate state.
 	 * @return The newly created Task.
 	 */
-	public static Task create(final Executor executor, final ClassOperation op, final Context context) {
+	public static Task create(final Executor executor, final ClassOperationProxy op, final Context context) {
 		final Task task = new Task(executor);
 		task.addWorker(new Runnable(){
 			@Override public void run() {

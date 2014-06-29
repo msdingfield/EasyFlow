@@ -14,7 +14,7 @@ public class ClassPathScannerClassOperationBuilderTest {
 
 	@Test
 	public void test() {
-		final List<ClassOperation> ops = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflow.reflect", "cpScanTestA");
+		final List<ClassOperationProxy> ops = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflow.reflect", "cpScanTestA");
 		assertEquals(3, ops.size());
 		
 		assertTrue(ops.contains(AnnotationClassOperationBuilder.fromClass(CpScanTestTopLevelOpA.class)));

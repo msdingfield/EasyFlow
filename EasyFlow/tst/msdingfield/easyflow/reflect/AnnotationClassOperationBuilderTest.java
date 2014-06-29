@@ -79,7 +79,7 @@ public class AnnotationClassOperationBuilderTest {
 	
 	@Test
 	public void testOperationWithNoParameters() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OperationNoParams.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OperationNoParams.class);
 		assertEquals(0, op.getInputs().size());
 		assertEquals(0, op.getOutputs().size());
 		
@@ -91,7 +91,7 @@ public class AnnotationClassOperationBuilderTest {
 
 	@Test
 	public void testOperationWithInput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OperationWithInputAttribute.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OperationWithInputAttribute.class);
 		assertEquals(1, op.getInputs().size());
 		assertEquals(0, op.getOutputs().size());
 		
@@ -107,7 +107,7 @@ public class AnnotationClassOperationBuilderTest {
 
 	@Test
 	public void testOperationWithOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OperationWithOutputAttribute.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OperationWithOutputAttribute.class);
 		assertEquals(0, op.getInputs().size());
 		assertEquals(1, op.getOutputs().size());
 		
@@ -121,7 +121,7 @@ public class AnnotationClassOperationBuilderTest {
 
 	@Test
 	public void testOperationWithInputOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OperationWithInputOutput.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OperationWithInputOutput.class);
 		assertEquals(1, op.getInputs().size());
 		assertEquals(1, op.getOutputs().size());
 
@@ -136,7 +136,7 @@ public class AnnotationClassOperationBuilderTest {
 		assertEquals("raboof", context.getEdgeValue("myOutput"));
 	}
 
-	private void runOperation(final ClassOperation op, final Context context) {
+	private void runOperation(final ClassOperationProxy op, final Context context) {
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);
 		task.schedule();
 		try {

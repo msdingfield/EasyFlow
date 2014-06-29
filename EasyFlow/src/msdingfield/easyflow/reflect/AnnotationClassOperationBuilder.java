@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Output;
-import msdingfield.easyflow.reflect.ClassOperation.Builder;
+import msdingfield.easyflow.reflect.ClassOperation;
 import msdingfield.easyflow.reflect.support.InvalidOperationBindingException;
 
 /** Builds a ClassOperation for an annotated class. */
@@ -19,12 +19,13 @@ public final class AnnotationClassOperationBuilder {
 	 * @param type A class with appropriate annotations.
 	 * @return ClassOperation bound to the given class.
 	 */
-	public static ClassOperation fromClass(final Class<?> type) {
+	public static ClassOperationProxy fromClass(final Class<?> type) {
 		if (type == null) {
 			throw new InvalidOperationBindingException("Failed to build ClassOperation.  Class reference is null.");
 		}
 		
-		final Builder builder = new ClassOperation.Builder(type);
+		final ClassOperation builder = new ClassOperation();
+		builder.setOperationClass(type);
 		
 		builder.setConstructor(findNoArgConstructor(type));
 		
@@ -38,7 +39,7 @@ public final class AnnotationClassOperationBuilder {
 			}
 		}
 		
-		return builder.newOperation();
+		return new ClassOperationProxy(builder);
 	}
 
 	private static Method findOperationAnnotatedMethod(final Class<?> type) {

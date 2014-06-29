@@ -5,21 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import msdingfield.easyflow.annotations.Aggregate;
+import msdingfield.easyflow.annotations.ForkOn;
 import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Output;
-import msdingfield.easyflow.annotations.ForkOn;
 import msdingfield.easyflow.annotations.Scope;
-import msdingfield.easyflow.execution.DefaultExecutor;
-import msdingfield.easyflow.execution.GroupTask;
 import msdingfield.easyflow.execution.Task;
 import msdingfield.easyflow.graph.FlowGraph;
 import msdingfield.easyflow.graph.FlowGraphTaskBuilder;
 import msdingfield.easyflow.reflect.ClassOperationFlowNode;
-import msdingfield.easyflow.reflect.ClassPathScannerClassOperationBuilder;
-import msdingfield.easyflow.reflect.ClassOperation;
+import msdingfield.easyflow.reflect.ClassOperationProxy;
 import msdingfield.easyflow.reflect.ClassOperationTaskFactory;
+import msdingfield.easyflow.reflect.ClassPathScannerClassOperationBuilder;
 import msdingfield.easyflow.reflect.Context;
 import msdingfield.easyflowexample.dal.LastViewedDao;
 import msdingfield.easyflowexample.dal.PortfolioDao;
@@ -37,54 +34,52 @@ public class Aggregator {
 
 	@Scope("equities")
 	public static class GetPortfolio {
-		
-		private PortfolioDao dao = new PortfolioDao();
-		
+
+		private final PortfolioDao dao = new PortfolioDao();
+
 		@Input
 		public String clientId;
-		
+
 		@Output
 		public ListenableFuture<Set<String>> portfolioSymbols;
-		
+
 		@Operation
 		public void doLookup() {
 			portfolioSymbols = dao.getPortfolio(clientId);
 		}
 	}
-	
+
 	@Scope("equities")
 	public static class GetPortfolioQuotes {
-		private StockQuoteDao dao = new StockQuoteDao();
-		
+		private final StockQuoteDao dao = new StockQuoteDao();
+
 		@ForkOn
 		@Input(connectedEdgeName="portfolioSymbols")
 		public String portfolioSymbol;
-		
-		@Aggregate
+
 		@Output(connectedEdgeName="portfolioQuotes")
 		public ListenableFuture<StockQuote> portfolioQuote;
-		
+
 		@Operation
 		public void begin() {
-			portfolioQuote = dao.getCurrentQuote(portfolioSymbol);			
+			portfolioQuote = dao.getCurrentQuote(portfolioSymbol);
 		}
 	}
-	
+
 	@Scope("equities")
 	public static class GetBalance {
-		private PortfolioDao dao = new PortfolioDao();
-		
+		private final PortfolioDao dao = new PortfolioDao();
+
 		@Input
 		public String clientId;
-		
+
 		@ForkOn
 		@Input(connectedEdgeName="portfolioSymbols")
 		public String portfolioSymbol;
-		
-		@Aggregate
+
 		@Output(connectedEdgeName="portfolioBalances")
-		public StockBalance portfolioBalance; 
-		
+		public StockBalance portfolioBalance;
+
 		@Operation
 		public void enact() {
 			final ListenableFuture<Integer> quantity = dao.getQuantity(clientId, portfolioSymbol);
@@ -94,7 +89,7 @@ public class Aggregator {
 				public void run() {
 					try {
 						portfolioBalance = new StockBalance(portfolioSymbol, quantity.get());
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						portfolioBalance = null;
 					}
 				}});
@@ -103,14 +98,14 @@ public class Aggregator {
 
 	@Scope("equities")
 	public static class GetLastViewed {
-		private LastViewedDao dao = new LastViewedDao();
-		
+		private final LastViewedDao dao = new LastViewedDao();
+
 		@Input
 		public String clientId;
-		
+
 		@Output
 		public ListenableFuture<Set<String>> viewedSymbols;
-		
+
 		@Operation
 		public void enact() {
 			viewedSymbols = dao.getLastViewedStocks(clientId);
@@ -119,40 +114,39 @@ public class Aggregator {
 
 	@Scope("equities")
 	public static class GetLastViewedQuotes {
-		private StockQuoteDao dao = new StockQuoteDao();
-		
+		private final StockQuoteDao dao = new StockQuoteDao();
+
 		@ForkOn
 		@Input(connectedEdgeName="viewedSymbols")
 		public String viewedSymbol;
-		
-		@Aggregate
+
 		@Output(connectedEdgeName="viewedQuotes")
 		public ListenableFuture<StockQuote> viewedQuote;
-		
+
 		@Operation
 		public void enact() {
-			viewedQuote = dao.getCurrentQuote(viewedSymbol);			
+			viewedQuote = dao.getCurrentQuote(viewedSymbol);
 		}
 	}
-	
+
 	@Scope("equities")
 	public static class DisplayAll {
-		
+
 		@Input
 		public Collection<String> portfolioSymbols;
-		
+
 		@Input
 		public Collection<StockQuote> portfolioQuotes;
-		
+
 		@Input
 		public Collection<StockBalance> portfolioBalances;
-		
-		@Input 
+
+		@Input
 		public Collection<String> viewedSymbols;
-		
+
 		@Input
 		public Collection<StockQuote> viewedQuotes;
-		
+
 		private static class Line {
 			public Line(final String symbol) {
 				this.symbol = symbol;
@@ -161,15 +155,15 @@ public class Aggregator {
 			public Integer quantity = null;
 			public Double value = null;
 		}
-		
+
 		private static Line get(final Map<String,Line> lines, final String symbol) {
 			if (!lines.containsKey(symbol)) {
 				lines.put(symbol, new Line(symbol));
-				
+
 			}
 			return lines.get(symbol);
 		}
-		
+
 		@Operation
 		public void enact() {
 			final Map<String,Line> portfolioLines = Maps.newHashMap();
@@ -185,7 +179,7 @@ public class Aggregator {
 			for(final StockBalance bal : portfolioBalances) {
 				get(portfolioLines, bal.getSymbol()).quantity = bal.getQuantity();
 			}
-			
+
 			final Map<String,Line> viewLines = Maps.newHashMap();
 			for (final String symbol : viewedSymbols) {
 				get(viewLines, symbol);
@@ -193,11 +187,11 @@ public class Aggregator {
 			for (final StockQuote quote : viewedQuotes) {
 				get(viewLines, quote.getSymbol()).value = quote.getAmount();
 			}
-			
+
 			for (final Line line : portfolioLines.values()) {
 				System.out.printf("%s: QTY: %d VAL: %f\n", line.symbol, line.quantity, line.value);
 			}
-			
+
 			for (final Line line : viewLines.values()) {
 				System.out.printf("%s: VAL: %f\n", line.symbol, line.value);
 			}
@@ -205,18 +199,18 @@ public class Aggregator {
 	}
 
 	public static void show(final String clientId) throws InterruptedException {
-		final List<ClassOperation> operations = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflowexample", "equities");
-		final FlowGraph<ClassOperationFlowNode> system = new FlowGraph<ClassOperationFlowNode>(Sets.newHashSet(Lists.transform(operations, new Function<ClassOperation, ClassOperationFlowNode>(){
-			@Override public ClassOperationFlowNode apply(ClassOperation arg0) {
+		final List<ClassOperationProxy> operations = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflowexample", "equities");
+		final FlowGraph<ClassOperationFlowNode> system = new FlowGraph<ClassOperationFlowNode>(Sets.newHashSet(Lists.transform(operations, new Function<ClassOperationProxy, ClassOperationFlowNode>(){
+			@Override public ClassOperationFlowNode apply(final ClassOperationProxy arg0) {
 				return new ClassOperationFlowNode(arg0);
 			}})));
 		final Context context = new Context();
 		context.setEdgeValue("clientId", clientId);
 		FlowGraphTaskBuilder
-			.graph(system)
-			.taskFactory(new ClassOperationTaskFactory(context))
-			.build()
-			.schedule()
-			.waitForCompletion();
+		.graph(system)
+		.taskFactory(new ClassOperationTaskFactory(context))
+		.build()
+		.schedule()
+		.waitForCompletion();
 	}
 }

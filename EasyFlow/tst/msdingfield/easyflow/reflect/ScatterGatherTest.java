@@ -39,7 +39,7 @@ public class ScatterGatherTest {
 	
 	@Test
 	public void test() throws InterruptedException {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterGatherOperation.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(ScatterGatherOperation.class);
 		final Context context = new Context();
 		context.setEdgeValue("numbers", Lists.newArrayList("8", "3", "6"));
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);

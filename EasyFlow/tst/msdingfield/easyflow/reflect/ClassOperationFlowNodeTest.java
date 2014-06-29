@@ -16,7 +16,7 @@ public class ClassOperationFlowNodeTest {
 
 	@Test
 	public void testClassOperationWithNoInputOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(NoIO.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(NoIO.class);
 		final ClassOperationFlowNode node = ClassOperationFlowNode.toFlowNode(op);
 		assertTrue(node.getInputs().isEmpty());
 		assertTrue(node.getOutputs().isEmpty());
@@ -25,7 +25,7 @@ public class ClassOperationFlowNodeTest {
 
 	@Test
 	public void testClassOperationWithInputOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(IO.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(IO.class);
 		final ClassOperationFlowNode node = ClassOperationFlowNode.toFlowNode(op);
 		assertEquals(1, node.getInputs().size());
 		assertTrue(node.getInputs().contains("input"));

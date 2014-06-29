@@ -9,7 +9,7 @@ import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Output;
 import msdingfield.easyflow.reflect.AnnotationClassOperationBuilder;
-import msdingfield.easyflow.reflect.ClassOperation;
+import msdingfield.easyflow.reflect.ClassOperationProxy;
 import msdingfield.easyflow.reflect.OperationInputPort;
 import msdingfield.easyflow.reflect.OperationOutputPort;
 import msdingfield.easyflow.reflect.OperationPort;
@@ -31,7 +31,7 @@ public class AnnotationClassOperationBuilderTest {
 	
 	@Test
 	public void testClassWithOneOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OneOutput.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OneOutput.class);
 		assertTrue(op.getInputs().isEmpty());
 		assertEquals(1, op.getOutputs().size());
 		assertEquals("output", op.getOutputs().iterator().next().getConnectedEdgeName());
@@ -40,7 +40,7 @@ public class AnnotationClassOperationBuilderTest {
 
 	@Test
 	public void testClassWithOneInput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(OneInput.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(OneInput.class);
 		assertTrue(op.getOutputs().isEmpty());
 		assertEquals(1, op.getInputs().size());
 		assertEquals("input", op.getInputs().iterator().next().getConnectedEdgeName());
@@ -49,7 +49,7 @@ public class AnnotationClassOperationBuilderTest {
 	
 	@Test
 	public void testClassWithInputAndOutput() {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(InputAndOutput.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(InputAndOutput.class);
 		
 		assertEquals(2, op.getOutputs().size());
 		final OperationOutputPort o1 = getPort(op.getOutputs(), "o1");

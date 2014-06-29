@@ -1,10 +1,17 @@
 package msdingfield.easyflow.execution;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 /**
  * A Task is a logical work item with dependencies.
@@ -14,26 +21,27 @@ import com.google.common.util.concurrent.ListenableFuture;
  * 
  * The task goes through the states defined by the State enum.  Runnables can
  * be registered to execute at various points in the lifecycle.
- *   
+ * 
  * @author Matt
  *
  */
 public class Task {
-	
+
 	private final Executor executor;
 	private final Collection<Runnable> workers = Lists.newArrayList();
 	private final Collection<Runnable> initializers = Lists.newArrayList();
 	private final Collection<Runnable> finalizers = Lists.newArrayList();
 	private final Collection<Runnable> completionListeners = Lists.newArrayList();
-	
+	private final List<Throwable> errors = new Vector<>();
+
 	private static final ThreadLocal<Task> currentTask = new ThreadLocal<>();
-	
+
 	/** Monitors scheduled work items. */
 	private final Monitor scheduledWork = new Monitor();
-	
+
 	enum State { UNSCHEDULED, BLOCKED, INITIALIZING, EXECUTING, FINALIZING, COMPLETE }
 	private State state = State.UNSCHEDULED;
-	
+
 	/** Create a task to invoke the given Runnable. */
 	public Task(final Executor executor) {
 		this.executor = executor;
@@ -42,23 +50,23 @@ public class Task {
 				onQuiet();
 			}});
 	}
-	
+
 	public Task(final Executor executor, final Runnable worker) {
 		this(executor);
 		addWorker(worker);
 	}
-	
+
 	public synchronized Task addWorker(final Runnable worker) {
 		checkUnsheduled();
 		workers.add(worker);
 		return this;
 	}
-	
+
 	public synchronized void addInitializer(final Runnable initializer) {
 		checkUnsheduled();
 		initializers.add(initializer);
 	}
-	
+
 	public synchronized void addFinalizer(final Runnable finalizer) {
 		checkUnsheduled();
 		finalizers.add(finalizer);
@@ -68,41 +76,33 @@ public class Task {
 		checkUnsheduled();
 		completionListeners.add(listener);
 	}
-	
+
 	public synchronized void waitForCompletion() throws InterruptedException {
 		if (isScheduled() && !isComplete()) {
 			this.wait();
 		}
 	}
-	
+
 	private boolean isComplete() {
 		return state == State.COMPLETE;
 	}
 
-	public synchronized void waitFor(final Task ... predecessors) {
-		checkUnsheduled();
-		
-		for (final Task predecessor : predecessors) {
-			scheduledWork.acquire();
-			
-			predecessor.addCompletionListener(new Runnable() {
-				@Override
-				public void run() {
-					scheduledWork.release();
-				}
-			});
-		}
+	public void waitFor(final Task ... predecessors) {
+		waitFor(Lists.newArrayList(predecessors));
 	}
 
 	public synchronized void waitFor(final Collection<? extends Task> predecessors) {
 		checkUnsheduled();
-		
+
 		for (final Task predecessor : predecessors) {
 			scheduledWork.acquire();
-			
+
 			predecessor.addCompletionListener(new Runnable() {
 				@Override
 				public void run() {
+					if (predecessor.isInError()) {
+						errors.add(new DependencyFailureException(predecessor));
+					}
 					scheduledWork.release();
 				}
 			});
@@ -114,7 +114,7 @@ public class Task {
 		setState(State.BLOCKED);
 		return this;
 	}
-	
+
 	private void checkUnsheduled() {
 		if (isScheduled()) {
 			throw new IllegalStateException();
@@ -124,7 +124,7 @@ public class Task {
 	public boolean isScheduled() {
 		return state != State.UNSCHEDULED;
 	}
-	
+
 	/** Execute a Runnable in the context of this task.
 	 * 
 	 * @param runnable The runnable instance to execute.
@@ -133,12 +133,12 @@ public class Task {
 		scheduledWork.acquire();
 		executor.execute(new Worker(runnable));
 	}
-	
+
 	private void executeWhenDone(final ListenableFuture<?> future, final Runnable runnable) {
 		scheduledWork.acquire();
 		future.addListener(new Worker(runnable), executor);
 	}
-	
+
 	/** Forks the current task.
 	 * 
 	 * The current task bound to the thread will not complete until the passed
@@ -153,13 +153,18 @@ public class Task {
 		}
 		task.execute(runnable);
 	}
-	
+
 	public static void fork(final ListenableFuture<?> future, final Runnable runnable) {
 		final Task task = currentTask.get();
 		if (task == null) {
 			throw new ForkFromNonTaskThreadException();
 		}
 		task.executeWhenDone(future, runnable);
+	}
+
+	public static <T> ListenableFuture<List<T>> combineFutures(final List<ListenableFuture<T>> futures) {
+		final AbstractFuture<List<T>> future = new FutureCombiner<T>(futures);
+		return future;
 	}
 
 	private void onQuiet() {
@@ -180,8 +185,12 @@ public class Task {
 			break;
 		}
 	}
-	
+
 	private void setState(final State state) {
+		if (state != State.COMPLETE && isInError()) {
+			setState(State.COMPLETE);
+		}
+
 		this.state = state;
 		switch(state) {
 		case UNSCHEDULED: break;
@@ -204,7 +213,11 @@ public class Task {
 			break;
 		}
 	}
-	
+
+	private boolean isInError() {
+		return !errors.isEmpty();
+	}
+
 	private void startInitializing() {
 		forkRunnables(initializers);
 	}
@@ -235,12 +248,20 @@ public class Task {
 		}
 	}
 
+	public static void addFatalError(final Throwable e) {
+		final Task task = currentTask.get();
+		task.errors.add(e);
+	}
+
+	public static void addFatalError(final String message, final Exception cause) {
+		addFatalError(new FatalErrorException(message, cause));
+	}
 	private class Worker implements Runnable {
 		private final Runnable inner;
 		public Worker(final Runnable inner) {
 			this.inner = inner;
 		}
-		
+
 		@Override
 		public void run() {
 			// If executor runs in same thread we can get recursive calls here
@@ -249,6 +270,8 @@ public class Task {
 			try {
 				currentTask.set(Task.this);
 				inner.run();
+			} catch (final Throwable t) {
+				addFatalError(t);
 			} finally {
 				currentTask.set(previousTask);
 				scheduledWork.release();
@@ -256,10 +279,77 @@ public class Task {
 		}
 	}
 
+	private static final class FutureCombiner<T> extends
+	AbstractFuture<List<T>> {
+
+		private final AtomicInteger remaining;
+		private final ArrayList<T> values;
+
+		public FutureCombiner(final List<ListenableFuture<T>> futures) {
+			remaining = new AtomicInteger(futures.size());
+			values = new ArrayList<T>();
+			int i = 0;
+			for (final ListenableFuture<T> item : futures) {
+				final int index = i++;
+				setItem(item, index);
+			}
+		}
+
+		private void setItem(final ListenableFuture<T> item, final int index) {
+			fork(item, new Runnable(){
+				@Override public void run() {
+					try {
+						values.set(index, Uninterruptibles.getUninterruptibly(item));
+						if (remaining.decrementAndGet() == 0) {
+							set(values);
+						}
+					} catch (final ExecutionException e) {
+						setException(e);
+						throw new FatalErrorException("Error unwinding list of futures.", e);
+					}
+				}});
+		}
+	}
+
 	public static class ForkFromNonTaskThreadException extends RuntimeException {
 		private static final long serialVersionUID = -228232928568742825L;
 		public ForkFromNonTaskThreadException() {
 			super("An attempt was made to fork from a thread not bound to a task.");
+		}
+	}
+
+	public static class FatalErrorException extends RuntimeException {
+		public FatalErrorException() {
+			super();
+		}
+
+		public FatalErrorException(final String message, final Throwable cause) {
+			super(message, cause);
+		}
+
+		public FatalErrorException(final String message) {
+			super(message);
+		}
+
+		public FatalErrorException(final Throwable cause) {
+			super(cause);
+		}
+
+		private static final long serialVersionUID = 6797297276936778661L;
+
+	}
+
+	public static final class DependencyFailureException extends RuntimeException {
+		private static final long serialVersionUID = -5150369448056789457L;
+		private final Task predecessor;
+
+		public DependencyFailureException(final Task predecessor) {
+			super("A task required by this task failed.");
+			this.predecessor = predecessor;
+		}
+
+		public Task getPredecessor() {
+			return predecessor;
 		}
 	}
 

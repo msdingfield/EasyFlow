@@ -43,8 +43,8 @@ public class FutureUnpackingTest {
 	
 	@Test
 	public void test() throws NoSuchMethodException, SecurityException, NoSuchFieldException, InterruptedException {
-		final ClassOperation futureTask = AnnotationClassOperationBuilder.fromClass(FutureTask.class);
-		final ClassOperation consumer = AnnotationClassOperationBuilder.fromClass(Consumer.class);
+		final ClassOperationProxy futureTask = AnnotationClassOperationBuilder.fromClass(FutureTask.class);
+		final ClassOperationProxy consumer = AnnotationClassOperationBuilder.fromClass(Consumer.class);
 		
 		final Context context = new Context();
 		final Task task1 = ClassOperationTaskFactory.create(executor, futureTask, context);

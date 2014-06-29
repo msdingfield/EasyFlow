@@ -17,6 +17,7 @@ public class Context {
 	 * the input/output ports of the operations.
 	 */
 	private Map<String, Object> edgeValues = Maps.newConcurrentMap();
+	private Map<String, Exception> edgeErrors = Maps.newConcurrentMap();
 	private Map<Object, Object> stateMap = Maps.newConcurrentMap();
 	
 	public void setEdgeValue(final String key, final Object value) {
@@ -29,6 +30,18 @@ public class Context {
 	
 	public boolean isEdgeSet(final String key) {
 		return edgeValues.containsKey(key);
+	}
+	
+	public void setEdgeError(final String key, final Exception exception) {
+		edgeErrors.put(key, exception);
+	}
+	
+	public Exception getEdgeError(final String key) {
+		return edgeErrors.get(key);
+	}
+	
+	public boolean isEdgeErrorSet(final String key) {
+		return edgeErrors.containsKey(key);
 	}
 
 	public void setStateValue(final Object key, final Object value) {

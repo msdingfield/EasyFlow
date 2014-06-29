@@ -39,7 +39,7 @@ public class ScatterTest {
 	
 	@Test
 	public void test() throws InterruptedException {
-		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterOperation.class);
+		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(ScatterOperation.class);
 		final Context context = new Context();
 		final HashMap<Integer, String> mapping = new HashMap<Integer,String>();
 		context.setEdgeValue("mapping", mapping);
