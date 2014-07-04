@@ -21,31 +21,31 @@ public class ScatterGatherTest {
 
 	@Rule
 	public TestExecutor executor = new TestExecutor();
-	
+
 	public static class ScatterGatherOperation {
 
 		@ForkOn
 		@Input(connectedEdgeName="numbers")
 		public String number;
-		
+
 		@Output
 		public int integer;
-		
+
 		@Operation
 		public void enact() {
 			integer = Integer.parseInt(number);
 		}
 	}
-	
+
 	@Test
 	public void test() throws InterruptedException {
-		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(ScatterGatherOperation.class);
+		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterGatherOperation.class);
 		final Context context = new Context();
 		context.setEdgeValue("numbers", Lists.newArrayList("8", "3", "6"));
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);
 		task.schedule();
-		task.waitForCompletion();
-		
+		task.join();
+
 		@SuppressWarnings("unchecked")
 		final Collection<Integer> integers = (Collection<Integer>) context.getEdgeValue("integer");
 		assertEquals(3, integers.size());

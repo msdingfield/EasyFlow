@@ -77,6 +77,6 @@ public class FlowGraphTaskBuilderTest {
 			.executor(executor)
 			.build();
 		
-		task.schedule().waitForCompletion();
+		task.schedule().join();
 	}
 }

@@ -1,6 +1,7 @@
 package msdingfield.easyflow.reflect;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class ClassOperationFlowNodeTest {
 
 	@Test
 	public void testClassOperationWithNoInputOutput() {
-		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(NoIO.class);
+		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(NoIO.class);
 		final ClassOperationFlowNode node = ClassOperationFlowNode.toFlowNode(op);
 		assertTrue(node.getInputs().isEmpty());
 		assertTrue(node.getOutputs().isEmpty());
@@ -25,15 +26,15 @@ public class ClassOperationFlowNodeTest {
 
 	@Test
 	public void testClassOperationWithInputOutput() {
-		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(IO.class);
+		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(IO.class);
 		final ClassOperationFlowNode node = ClassOperationFlowNode.toFlowNode(op);
 		assertEquals(1, node.getInputs().size());
 		assertTrue(node.getInputs().contains("input"));
-		
+
 		assertEquals(1, node.getOutputs().size());
 		assertTrue(node.getOutputs().contains("output"));
 	}
-	
+
 	@Test
 	public void testMultipleClasses() {
 		final ClassOperationFlowNode op1 = ClassOperationFlowNode.toFlowNode(AnnotationClassOperationBuilder.fromClass(NoIO.class));
@@ -47,14 +48,14 @@ public class ClassOperationFlowNodeTest {
 	}
 
 	public static class NoIO { @Operation public void op(){}}
-	
+
 	public static class IO {
 		@Input
 		public int input = 0;
-		
+
 		@Output
 		public int output = 0;
-		
+
 		@Operation
 		public void op() {}
 	}

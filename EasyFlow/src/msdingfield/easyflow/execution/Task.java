@@ -40,7 +40,7 @@ public class Task {
 	private final Monitor scheduledWork = new Monitor();
 
 	enum State { UNSCHEDULED, BLOCKED, INITIALIZING, EXECUTING, FINALIZING, COMPLETE }
-	private State state = State.UNSCHEDULED;
+	private volatile State state = State.UNSCHEDULED;
 
 	/** Create a task to invoke the given Runnable. */
 	public Task(final Executor executor) {
@@ -77,14 +77,34 @@ public class Task {
 		completionListeners.add(listener);
 	}
 
-	public synchronized void waitForCompletion() throws InterruptedException {
+	public synchronized void join() throws InterruptedException {
 		if (isScheduled() && !isComplete()) {
 			this.wait();
 		}
 	}
 
-	private boolean isComplete() {
+	public synchronized void join(final long timeout) throws InterruptedException {
+		if (isScheduled() && !isComplete()) {
+			this.wait(timeout);
+		}
+	}
+
+	public synchronized void join(final long timeout, final int nanos) throws InterruptedException {
+		if (isScheduled() && !isComplete()) {
+			this.wait(timeout, nanos);
+		}
+	}
+
+	public boolean isComplete() {
 		return state == State.COMPLETE;
+	}
+
+	public boolean isSuccess() {
+		return isComplete() && errors.isEmpty();
+	}
+
+	public Collection<Throwable> getErrors() {
+		return Lists.newArrayList(errors);
 	}
 
 	public void waitFor(final Task ... predecessors) {
@@ -189,6 +209,7 @@ public class Task {
 	private void setState(final State state) {
 		if (state != State.COMPLETE && isInError()) {
 			setState(State.COMPLETE);
+			return;
 		}
 
 		this.state = state;
@@ -288,6 +309,9 @@ public class Task {
 		public FutureCombiner(final List<ListenableFuture<T>> futures) {
 			remaining = new AtomicInteger(futures.size());
 			values = new ArrayList<T>();
+			for (int n = 0; n < futures.size(); ++ n) {
+				values.add(null);
+			}
 			int i = 0;
 			for (final ListenableFuture<T> item : futures) {
 				final int index = i++;
@@ -351,6 +375,12 @@ public class Task {
 		public Task getPredecessor() {
 			return predecessor;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Task [workers=" + workers + ", errors=" + errors
+				+ ", scheduledWork=" + scheduledWork + ", state=" + state + "]\n";
 	}
 
 }

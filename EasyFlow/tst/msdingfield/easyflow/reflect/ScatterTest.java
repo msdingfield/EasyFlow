@@ -20,34 +20,34 @@ public class ScatterTest {
 
 	@Rule
 	public TestExecutor executor = new TestExecutor();
-	
+
 	public static class ScatterOperation {
-   		
+
 		@Input
 		public Map<Integer,String> mapping;
 
 		@ForkOn
 		@Input(connectedEdgeName="numbers")
 		public String number;
-		
+
 		@Operation
 		public void enact() {
 			final int n = Integer.parseInt(number);
 			mapping.put(n, number);
 		}
 	}
-	
+
 	@Test
 	public void test() throws InterruptedException {
-		final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(ScatterOperation.class);
+		final ClassOperation op = AnnotationClassOperationBuilder.fromClass(ScatterOperation.class);
 		final Context context = new Context();
 		final HashMap<Integer, String> mapping = new HashMap<Integer,String>();
 		context.setEdgeValue("mapping", mapping);
 		context.setEdgeValue("numbers", Lists.newArrayList("8", "3", "6"));
 		final Task task = ClassOperationTaskFactory.create(executor, op, context);
 		task.schedule();
-		task.waitForCompletion();
-		
+		task.join();
+
 		assertEquals(3, mapping.size());
 		assertEquals("3", mapping.get(3));
 		assertEquals("6", mapping.get(6));

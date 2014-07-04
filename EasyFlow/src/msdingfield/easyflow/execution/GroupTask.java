@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
  *
  */
 public class GroupTask extends Task {
-	
+
 	/** The collection of subtasks in the group. */
 	private final Collection<Task> subtasks = Lists.newArrayList();
 
@@ -27,17 +27,22 @@ public class GroupTask extends Task {
 		this.subtasks.addAll(subtasks);
 		this.waitFor(subtasks);
 	}
-	
+
 	/** Schedule subtasks and this GroupTasks. */
 	@Override
 	public Task schedule() {
 		for (final Task task : subtasks) {
 			task.schedule();
 		}
-		
+
 		super.schedule();
-	
+
 		return this;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "GroupTask [super=" + super.toString() +", subtasks=" + subtasks + "]";
+	}
+
 }

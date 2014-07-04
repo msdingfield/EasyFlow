@@ -1,27 +1,28 @@
 package msdingfield.easyflow.reflect;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-
-import org.junit.Test;
 
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Scope;
 import msdingfield.easyflow.reflect.nestedpackage.CpScanTestNestedOp;
 
+import org.junit.Test;
+
 public class ClassPathScannerClassOperationBuilderTest {
 
 	@Test
 	public void test() {
-		final List<ClassOperationProxy> ops = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflow.reflect", "cpScanTestA");
+		final List<ClassOperation> ops = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflow.reflect", "cpScanTestA");
 		assertEquals(3, ops.size());
-		
+
 		assertTrue(ops.contains(AnnotationClassOperationBuilder.fromClass(CpScanTestTopLevelOpA.class)));
 		assertTrue(ops.contains(AnnotationClassOperationBuilder.fromClass(InnerClassOpA.class)));
 		assertTrue(ops.contains(AnnotationClassOperationBuilder.fromClass(CpScanTestNestedOp.class)));
 	}
-	
+
 	@Scope("cpScanTestA")
 	public static class InnerClassOpA {
 		@Operation

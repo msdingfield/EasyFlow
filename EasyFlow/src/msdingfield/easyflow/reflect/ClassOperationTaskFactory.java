@@ -8,7 +8,7 @@ import msdingfield.easyflow.graph.TaskFactory;
 /** Create Task instances for ClassOperationFlowNode instances.
  * 
  * Construct the factory with a Context instance.  The Task instances created
- * are bound to the Context instance, Executor and ClassOperation contained 
+ * are bound to the Context instance, Executor and ClassOperation contained
  * within the ClassOperationFlowNode.
  * 
  * @author Matt
@@ -17,11 +17,11 @@ import msdingfield.easyflow.graph.TaskFactory;
 public class ClassOperationTaskFactory implements TaskFactory<ClassOperationFlowNode> {
 
 	private final Context context;
-	
+
 	public ClassOperationTaskFactory(final Context context) {
 		this.context = context;
 	}
-	
+
 	/**
 	 * Create a new Task bound to context, executor and node.getOp().
 	 */
@@ -29,7 +29,7 @@ public class ClassOperationTaskFactory implements TaskFactory<ClassOperationFlow
 	public Task create(final Executor executor, final ClassOperationFlowNode node) {
 		return create(executor, node.getOp(), context);
 	}
-	
+
 	/**
 	 * Static helper creating a Task bound to executor, op and context.
 	 * 
@@ -38,19 +38,20 @@ public class ClassOperationTaskFactory implements TaskFactory<ClassOperationFlow
 	 * @param context The Context instance which will hold intermediate state.
 	 * @return The newly created Task.
 	 */
-	public static Task create(final Executor executor, final ClassOperationProxy op, final Context context) {
+	public static Task create(final Executor executor, final ClassOperation op, final Context context) {
+		final ClassOperationProxy proxy = new ClassOperationProxy(op);
 		final Task task = new Task(executor);
 		task.addWorker(new Runnable(){
 			@Override public void run() {
-				op.execute(context);
+				proxy.execute(context);
 			}});
 		task.addInitializer(new Runnable(){
 			@Override public void run() {
-				op.before(context);
+				proxy.before(context);
 			}});
 		task.addFinalizer(new Runnable(){
 			@Override public void run() {
-				op.after(context);
+				proxy.after(context);
 			}});
 		return task;
 	}

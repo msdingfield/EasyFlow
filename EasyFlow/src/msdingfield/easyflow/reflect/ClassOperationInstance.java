@@ -15,12 +15,32 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
+/**
+ * The evaluation time instance of a ClassOperation.
+ * 
+ * This class can hold multiple instances of the user class if the operation
+ * is parallelized.  Each instance of the user class is referred to as an
+ * iteration.
+ * 
+ * When the begin method() is invoked, one or more instances of the user class
+ * are created and the operation inputs populated from the context.  When the
+ * after() method is invoked, the outputs are written back into the context.
+ * 
+ * In use, the methods before(), execute() and after() should be called in
+ * exactly that order.  Care must be taken because method may initiate
+ * asynchronous tasks which continue after method returns.  The next method in
+ * the sequence must not be invoked until all of the asynchronous tasks complete
+
+ * @author Matt
+ *
+ */
 public class ClassOperationInstance {
 
 	private final ClassOperation operation;
 	private final Context context;
 	private final List<OperationIteration> iterations = Lists.newArrayList();
 
+	/** Points to a collection on which to parallelized if this is a parallel operation. */
 	private final OperationInputPort forkOn;
 
 	public ClassOperationInstance(final ClassOperation outer, final Context context) {
@@ -241,7 +261,7 @@ public class ClassOperationInstance {
 							all.addAll(nonFutureList);
 							all.addAll(Uninterruptibles.getUninterruptibly(combinedFuture));
 							set(all);
-						} catch (final ExecutionException|IllegalArgumentException e) {
+						} catch (final Exception e) {
 							setException(e);
 							throw new Task.FatalErrorException("Error getting values from collection of futures.", e);
 						}
@@ -267,8 +287,10 @@ public class ClassOperationInstance {
 		public OperationIteration() {
 			try {
 				this.object = operation.getConstructor().newInstance();
-			} catch (IllegalAccessException|InstantiationException|InvocationTargetException e) {
+			} catch (IllegalAccessException|InstantiationException e) {
 				throw new Task.FatalErrorException("Failed to create instance of operation class.", e);
+			} catch (final InvocationTargetException e) {
+				throw new Task.FatalErrorException("User exception in operation constructor.", e.getCause());
 			}
 		}
 
@@ -279,7 +301,7 @@ public class ClassOperationInstance {
 			} catch (IllegalAccessException|IllegalArgumentException e) {
 				throw new Task.FatalErrorException("Internal error while invoking operation.", e);
 			} catch (final InvocationTargetException e) {
-				throw new Task.FatalErrorException("User operation threw exception.", e);
+				throw new Task.FatalErrorException("User operation threw exception.", e.getCause());
 			}
 		}
 

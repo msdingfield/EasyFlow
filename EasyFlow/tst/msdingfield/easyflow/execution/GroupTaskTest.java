@@ -18,7 +18,7 @@ public class GroupTaskTest {
 		
 		final GroupTask gt = new GroupTask(executor, Collections.<Task>emptyList());
 		
-		gt.schedule().waitForCompletion();
+		gt.schedule().join();
 	}
 	
 	@Test
@@ -35,7 +35,7 @@ public class GroupTaskTest {
 			}});
 		
 		final GroupTask gt = new GroupTask(executor, Lists.newArrayList(task));
-		gt.schedule().waitForCompletion();
+		gt.schedule().join();
 		assertEquals(1, state.get());
 	}
 }

@@ -70,7 +70,7 @@ public class TaskTest {
 				Task.fork(runnableB);
 			}});
 		task.schedule();
-		task.waitForCompletion();
+		task.join();
 	}
 	
 	@Test
@@ -108,7 +108,7 @@ public class TaskTest {
 		task.waitFor(predecessor);
 		predecessor.schedule();
 		task.schedule();
-		task.waitForCompletion();
+		task.join();
 	}
 	
 	@Test
@@ -143,7 +143,7 @@ public class TaskTest {
 		task.schedule();
 		predecessor1.schedule();
 		predecessor2.schedule();
-		task.waitForCompletion();
+		task.join();
 	}
 	
 	@Test
@@ -163,8 +163,8 @@ public class TaskTest {
 		task.schedule();
 		successor1.schedule();
 		successor2.schedule();
-		successor1.waitForCompletion();
-		successor2.waitForCompletion();
+		successor1.join();
+		successor2.join();
 	}
 	
 	@Test
@@ -187,7 +187,7 @@ public class TaskTest {
 			task.schedule();
 		}
 		
-		tasks[3].waitForCompletion();
+		tasks[3].join();
 		
 		assertEquals("ba", output.get(0));
 		assertEquals("ea", output.get(1));

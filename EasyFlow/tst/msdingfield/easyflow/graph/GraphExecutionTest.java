@@ -142,7 +142,7 @@ public class GraphExecutionTest {
 		.graph(graph)
 		.taskFactory(AddOperation.getTaskFactory(context))
 		.build()
-		.schedule().waitForCompletion();
+		.schedule().join();
 		
 		assertEquals(params.aValue, context.getEdgeValue("a"));
 		assertEquals(params.b1Value, context.getEdgeValue("b.1"));

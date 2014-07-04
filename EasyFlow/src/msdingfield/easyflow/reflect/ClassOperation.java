@@ -7,6 +7,15 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+/**
+ * Defines an operation which transforms inputs to outputs.
+ * 
+ * Normally this is used by AnnotationClassOperationBuilder while creating
+ * a ClassOperationProxy.
+ * 
+ * @author Matt
+ *
+ */
 public class ClassOperation {
 	/** Class containing the operation method and input/output. */
 	private Class<?> operationClass;
@@ -91,43 +100,62 @@ public class ClassOperation {
 		addOutput(new FieldOperationOutputPort(output));
 	}
 
-	// TODO: Remove builder!!!
-	/*
-	public static class Builder {
-		private final Class<?> operationClass;
-		private Constructor<?> constructor = null;
-		private Method operationMethod = null;
-		private final Set<OperationInputPort> inputs = Sets.newHashSet();
-		private final Set<OperationOutputPort> outputs = Sets.newHashSet();
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((inputs == null) ? 0 : inputs.hashCode());
+		result = prime * result
+				+ ((operationClass == null) ? 0 : operationClass.hashCode());
+		result = prime * result
+				+ ((operationMethod == null) ? 0 : operationMethod.hashCode());
+		result = prime * result + ((outputs == null) ? 0 : outputs.hashCode());
+		return result;
+	}
 
-		public Builder(final Class<?> operationClass) {
-			this.operationClass = operationClass;
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
 		}
-
-		public Builder setOperationMethod(final Method operationMethod) {
-			this.operationMethod = operationMethod;
-			return this;
+		if (obj == null) {
+			return false;
 		}
-
-		public Builder setConstructor(final Constructor<?> constructor) {
-			this.constructor = constructor;
-			return this;
+		if (getClass() != obj.getClass()) {
+			return false;
 		}
-
-		public Builder addInput(final Field field) {
-			inputs.add(new FieldOperationInputPort(field));
-			return this;
+		final ClassOperation other = (ClassOperation) obj;
+		if (inputs == null) {
+			if (other.inputs != null) {
+				return false;
+			}
+		} else if (!inputs.equals(other.inputs)) {
+			return false;
 		}
-
-		public Builder addOutput(final Field field) {
-			outputs.add(new FieldOperationOutputPort(field));
-			return this;
+		if (operationClass != other.operationClass) {
+			return false;
 		}
-
-		public ClassOperation newOperation() {
-			final ClassOperation op = new ClassOperation(this);
-			return op;
+		if (operationMethod == null) {
+			if (other.operationMethod != null) {
+				return false;
+			}
+		} else if (!operationMethod.equals(other.operationMethod)) {
+			return false;
 		}
-	}*/
+		if (outputs == null) {
+			if (other.outputs != null) {
+				return false;
+			}
+		} else if (!outputs.equals(other.outputs)) {
+			return false;
+		}
+		return true;
+	}
 
+	@Override
+	public String toString() {
+		return "ClassOperation [operationClass=" + operationClass
+				+ ", operationMethod=" + operationMethod + ", inputs=" + inputs
+				+ ", outputs=" + outputs + "]";
+	}
 }

@@ -1,10 +1,10 @@
 package msdingfield.easyflowexample;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import msdingfield.easyflow.EasyFlow;
 import msdingfield.easyflow.annotations.ForkOn;
 import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
@@ -12,11 +12,7 @@ import msdingfield.easyflow.annotations.Output;
 import msdingfield.easyflow.annotations.Scope;
 import msdingfield.easyflow.execution.Task;
 import msdingfield.easyflow.graph.FlowGraph;
-import msdingfield.easyflow.graph.FlowGraphTaskBuilder;
 import msdingfield.easyflow.reflect.ClassOperationFlowNode;
-import msdingfield.easyflow.reflect.ClassOperationProxy;
-import msdingfield.easyflow.reflect.ClassOperationTaskFactory;
-import msdingfield.easyflow.reflect.ClassPathScannerClassOperationBuilder;
 import msdingfield.easyflow.reflect.Context;
 import msdingfield.easyflowexample.dal.LastViewedDao;
 import msdingfield.easyflowexample.dal.PortfolioDao;
@@ -24,10 +20,7 @@ import msdingfield.easyflowexample.dal.StockQuoteDao;
 import msdingfield.easyflowexample.model.StockBalance;
 import msdingfield.easyflowexample.model.StockQuote;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class Aggregator {
@@ -199,18 +192,10 @@ public class Aggregator {
 	}
 
 	public static void show(final String clientId) throws InterruptedException {
-		final List<ClassOperationProxy> operations = ClassPathScannerClassOperationBuilder.loadOperationsOnClasspath("msdingfield.easyflowexample", "equities");
-		final FlowGraph<ClassOperationFlowNode> system = new FlowGraph<ClassOperationFlowNode>(Sets.newHashSet(Lists.transform(operations, new Function<ClassOperationProxy, ClassOperationFlowNode>(){
-			@Override public ClassOperationFlowNode apply(final ClassOperationProxy arg0) {
-				return new ClassOperationFlowNode(arg0);
-			}})));
+		final FlowGraph<ClassOperationFlowNode> system = EasyFlow.loadFlowGraph("msdingfield.easyflowexample", "equities");
 		final Context context = new Context();
 		context.setEdgeValue("clientId", clientId);
-		FlowGraphTaskBuilder
-		.graph(system)
-		.taskFactory(new ClassOperationTaskFactory(context))
-		.build()
-		.schedule()
-		.waitForCompletion();
+		final Task task = EasyFlow.evaluate(system, context);
+		task.join();
 	}
 }

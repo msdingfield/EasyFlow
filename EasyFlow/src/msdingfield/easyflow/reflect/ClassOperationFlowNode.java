@@ -12,30 +12,30 @@ import com.google.common.collect.Sets;
 /**
  * FlowNode implemented in terms of ClassOperation.
  * 
- * This class adapts a ClassOperation so that dependencies among 
+ * This class adapts a ClassOperation so that dependencies among
  * ClassOperations can be analyzed using the FlowGraph class.
  * 
  * @author Matt
  *
  */
 public class ClassOperationFlowNode implements FlowNode {
-	private final ClassOperationProxy op;
-	
-	public static ClassOperationFlowNode toFlowNode(final ClassOperationProxy op) {
+	private final ClassOperation op;
+
+	public static ClassOperationFlowNode toFlowNode(final ClassOperation op) {
 		return new ClassOperationFlowNode(op);
 	}
-	
-	public static List<ClassOperationFlowNode> toFlowNodes(final List<ClassOperationProxy> ops) {
-		return Lists.transform(ops, new Function<ClassOperationProxy, ClassOperationFlowNode>(){
-			@Override public ClassOperationFlowNode apply(ClassOperationProxy arg0) {
+
+	public static List<ClassOperationFlowNode> toFlowNodes(final List<ClassOperation> ops) {
+		return Lists.transform(ops, new Function<ClassOperation, ClassOperationFlowNode>(){
+			@Override public ClassOperationFlowNode apply(final ClassOperation arg0) {
 				return toFlowNode(arg0);
 			}});
 	}
-	
-	public ClassOperationFlowNode(final ClassOperationProxy op) {
+
+	public ClassOperationFlowNode(final ClassOperation op) {
 		this.op = op;
 	}
-	
+
 	@Override
 	public Set<String> getOutputs() {
 		final Set<String> outputs = Sets.newHashSet();
@@ -54,7 +54,7 @@ public class ClassOperationFlowNode implements FlowNode {
 		return inputPorts;
 	}
 
-	public ClassOperationProxy getOp() {
+	public ClassOperation getOp() {
 		return op;
 	}
 
@@ -73,19 +73,24 @@ public class ClassOperationFlowNode implements FlowNode {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		ClassOperationFlowNode other = (ClassOperationFlowNode) obj;
+		}
+		final ClassOperationFlowNode other = (ClassOperationFlowNode) obj;
 		if (op == null) {
-			if (other.op != null)
+			if (other.op != null) {
 				return false;
-		} else if (!op.equals(other.op))
+			}
+		} else if (!op.equals(other.op)) {
 			return false;
+		}
 		return true;
 	}
 }

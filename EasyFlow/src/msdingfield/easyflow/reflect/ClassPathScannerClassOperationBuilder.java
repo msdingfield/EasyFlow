@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 
 /** Helpers for scanning the class path for ClassOperations.
  * 
- * This class uses its own class loader and assumes it was loaded with a 
+ * This class uses its own class loader and assumes it was loaded with a
  * URLClassLoader implementation.
  * 
  * @author Matt
@@ -25,35 +25,35 @@ public class ClassPathScannerClassOperationBuilder {
 	 * 
 	 * This limits excludes classes not annotated with the requested scope.
 	 * 
-	 * This will search for top level and static inner classes.  Class must 
+	 * This will search for top level and static inner classes.  Class must
 	 * have @Scope annotation and have one method with @Operation annotation.
 	 * 
 	 * @param basePkg Java package to scan.
 	 * @param scope The scope to load.
 	 * @return List of ClassOperations.
 	 */
-	public static List<ClassOperationProxy> loadOperationsOnClasspath(
+	public static List<ClassOperation> loadOperationsOnClasspath(
 			final String basePkg, final String scope) {
-		final List<ClassOperationProxy> operations = Lists.newArrayList();
-	
+		final List<ClassOperation> operations = Lists.newArrayList();
+
 		final URLClassLoader classLoader = (URLClassLoader) ClassPathScannerClassOperationBuilder.class.getClassLoader();
 		loadFrom(ClassScanner.from(classLoader, basePkg), scope, operations);
 		return operations;
 	}
-	
+
 	private static void loadFrom(final Iterable<Class<?>> scanner, final String scope,
-			final List<ClassOperationProxy> operations) {
+			final List<ClassOperation> operations) {
 		for (final Class<?> type : scanner) {
 			loadFrom(ClassScanner.from(type), scope, operations);
-			
+
 			if (isStaticClass(type) && isInScope(type, scope) && ClassPathScannerClassOperationBuilder.isAnnotatedOperationClass(type)) {
-				final ClassOperationProxy op = AnnotationClassOperationBuilder.fromClass(type);
+				final ClassOperation op = AnnotationClassOperationBuilder.fromClass(type);
 				operations.add(op);
 			}
 		}
 	}
-	
-	private static boolean isStaticClass(Class<?> type) {
+
+	private static boolean isStaticClass(final Class<?> type) {
 		final int modifiers = type.getModifiers();
 		final boolean isStatic = (modifiers & Modifier.STATIC) != 0;
 		final boolean isTopmost = type.getEnclosingClass() == null;
@@ -64,16 +64,16 @@ public class ClassPathScannerClassOperationBuilder {
 		if (scope == null) {
 			return true;
 		}
-		
+
 		if (!type.isAnnotationPresent(Scope.class)) {
 			return false;
 		}
-		
+
 		final Scope scopeAnnotation = type.getAnnotation(Scope.class);
 		if (scope.equals(scopeAnnotation.value())) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -87,5 +87,5 @@ public class ClassPathScannerClassOperationBuilder {
 		}
 		return false;
 	}
-	
+
 }
