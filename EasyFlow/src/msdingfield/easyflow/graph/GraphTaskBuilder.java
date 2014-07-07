@@ -21,30 +21,30 @@ import com.google.common.collect.Maps;
  * @author Matt
  *
  */
-public class FlowGraphTaskBuilder {
+public class GraphTaskBuilder {
 
-	public static <T extends FlowNode> FactoryStep<T> graph(final FlowGraph<T> graph) {
+	public static <T extends GraphNode> FactoryStep<T> graph(final Graph<T> graph) {
 		return new Builder<T>().graph(graph);
 	}
 	
-	public static interface FactoryStep<T extends FlowNode> {
+	public static interface FactoryStep<T extends GraphNode> {
 		ExecutorStep<T> taskFactory(final TaskFactory<T> factory);
 	}
 
-	public static interface ExecutorStep<T extends FlowNode> extends BuildStep<T> {
+	public static interface ExecutorStep<T extends GraphNode> extends BuildStep<T> {
 		BuildStep<T> executor(final Executor executor);
 	}
 	
-	public static interface BuildStep<T extends FlowNode> {
+	public static interface BuildStep<T extends GraphNode> {
 		Task build();
 	}
 
-	public static class Builder<T extends FlowNode> implements FactoryStep<T>, ExecutorStep<T>, BuildStep<T> {
-		private FlowGraph<T> graph = null;
+	public static class Builder<T extends GraphNode> implements FactoryStep<T>, ExecutorStep<T>, BuildStep<T> {
+		private Graph<T> graph = null;
 		private TaskFactory<T> factory = null;
 		private Executor executor = DefaultExecutor.get();
 		
-		public FactoryStep<T> graph(final FlowGraph<T> graph) {
+		public FactoryStep<T> graph(final Graph<T> graph) {
 			this.graph = graph;
 			return this;
 		}

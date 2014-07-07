@@ -14,12 +14,12 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-public class FlowGraphTaskBuilderTest {
+public class GraphTaskBuilderTest {
 
 	@Rule
 	public JUnitRuleMockery mockery = new JUnitRuleMockery();
 	
-	private FlowGraph<TestNode> graph = new FlowGraph<TestNode>(
+	private Graph<TestNode> graph = new Graph<TestNode>(
 			Sets.<TestNode>newHashSet(
 					new TestNode("a").withOutput("e"), 
 					new TestNode("b").withInput("e")));
@@ -43,7 +43,7 @@ public class FlowGraphTaskBuilderTest {
 			will(returnValue(new Task(DefaultExecutor.get()))); 
 		}});
 		
-		FlowGraphTaskBuilder
+		GraphTaskBuilder
 			.graph(graph)
 			.taskFactory(factory)
 			.build();
@@ -71,7 +71,7 @@ public class FlowGraphTaskBuilderTest {
 			oneOf(runB).run(); inSequence(seq);
 		}});
 		
-		final Task task = FlowGraphTaskBuilder
+		final Task task = GraphTaskBuilder
 			.graph(graph)
 			.taskFactory(factory)
 			.executor(executor)

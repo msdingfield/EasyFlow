@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import msdingfield.easyflow.execution.Task;
-import msdingfield.easyflow.graph.FlowGraph;
-import msdingfield.easyflow.graph.FlowGraphTaskBuilder;
+import msdingfield.easyflow.graph.Graph;
+import msdingfield.easyflow.graph.GraphTaskBuilder;
 import msdingfield.easyflow.graph.TaskFactory;
 import msdingfield.easyflow.reflect.Context;
 
@@ -135,10 +135,10 @@ public class GraphExecutionTest {
 	
 	@Test
 	public void test() throws InterruptedException {
-		final FlowGraph<AddOperation> graph = new FlowGraph<AddOperation>(params.ops);
+		final Graph<AddOperation> graph = new Graph<AddOperation>(params.ops);
 		
 		context.setEdgeValue(params.inputKey, params.inputValue);
-		FlowGraphTaskBuilder
+		GraphTaskBuilder
 		.graph(graph)
 		.taskFactory(AddOperation.getTaskFactory(context))
 		.build()

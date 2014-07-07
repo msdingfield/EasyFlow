@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import msdingfield.easyflow.graph.support.CyclicDependencyException;
 import msdingfield.easyflow.graph.support.DuplicateOutputsFoundException;
 import msdingfield.easyflow.graph.support.NodeNotFoundException;
 import msdingfield.easyflow.graph.support.OutputNotFoundException;
-import msdingfield.easyflow.support.CyclicDependencyException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,15 +22,15 @@ import com.google.common.collect.Sets;
  * naming input and output vertices.  The FlowGraph connects nodes by matching
  * named inputs with named outputs.
  * 
- * Since it is assumed that each vertex represents a value to be transmitted 
- * from a producer to a consumer, it is not allowed for the same name to be 
+ * Since it is assumed that each vertex represents a value to be transmitted
+ * from a producer to a consumer, it is not allowed for the same name to be
  * applied to more than one node output.  Constructing a FlowGraph with such
  * a set of FlowNodes will throw a DuplicateOutputsFoundException.
  * 
  * Cycles are also not allowed.  Constructing a FlowGraph which contains cycles
- * will throw FlowCyclicDependencyException.
+ * will throw CyclicDependencyException.
  * 
- * However, it is not required that every output be consumed or that every 
+ * However, it is not required that every output be consumed or that every
  * input receive a value.  Unused outputs are ignored.  Typically, nodes
  * with unsatisfied inputs are also ignored.  The expectation is that the graph
  * will define a superset of the task nodes desired for a single use and so
@@ -39,21 +39,21 @@ import com.google.common.collect.Sets;
  * @author Matt
  *
  */
-public class FlowGraph<Node extends FlowNode> {
+public class Graph<Node extends GraphNode> {
 
 	/** All nodes in graph. */
 	private final Set<Node> allNodes = Sets.newHashSet();
 
-	/** 
+	/**
 	 * Map from the named output to producing node.
 	 * 
-	 * The presence of a name in this map implies the name is the output of 
+	 * The presence of a name in this map implies the name is the output of
 	 * exactly 1 node in the graph.  However, no inference is possible on the
 	 * number of nodes consuming the output.
 	 */
 	private final Map<String, Node> outputNameToNode = Maps.newHashMap();
 
-	/** 
+	/**
 	 * Map from named input to all consuming nodes.
 	 * 
 	 * The presence of a name in this map implies the name is the input of
@@ -62,21 +62,21 @@ public class FlowGraph<Node extends FlowNode> {
 	 */
 	private final Map<String, Set<Node>> inputNameToNodes = Maps.newHashMap();
 
-	/** 
+	/**
 	 * Map of a node to its direct predecessor nodes.
 	 * 
-	 * This is a map from a node to all of its non-transitive predecessors.  
+	 * This is a map from a node to all of its non-transitive predecessors.
 	 * That is, there is a directed edge into Node N from each node in the set
 	 * directPredecessors.get(N).
 	 * 
-	 * This implies the following constraint: 
+	 * This implies the following constraint:
 	 * 
-	 * ND.getInputs().contains(NM) iff exists P in directPredecessors.get(ND) 
+	 * ND.getInputs().contains(NM) iff exists P in directPredecessors.get(ND)
 	 * such that P.getOutputs().contains(NM)
 	 */
 	private final Map<Node, Set<Node>> directPredecessors = Maps.newHashMap();
 
-	/** 
+	/**
 	 * Map of node to its direct successor nodes.
 	 * 
 	 * This is a map from a node to all of its non-transitive successors.
@@ -91,7 +91,7 @@ public class FlowGraph<Node extends FlowNode> {
 	private final Map<Node, Set<Node>> directSuccessors = Maps.newHashMap();
 
 	/** Create FlowGraph from a set of nodes. */
-	public FlowGraph(final Set<Node> nodes) {
+	public Graph(final Set<Node> nodes) {
 		allNodes.addAll(nodes);
 		init();
 	}
@@ -148,12 +148,12 @@ public class FlowGraph<Node extends FlowNode> {
 	}
 
 	/** Creates a minimal graph with the requested outputs. */
-	public FlowGraph<Node> getSubGraphForOutputs(final Set<String> outputNames) {
+	public Graph<Node> getSubGraphForOutputs(final Set<String> outputNames) {
 		final Set<Node> subgraphNodes = Sets.newHashSet();
 		for (final String outputName : outputNames) {
 			subgraphNodes.addAll(getTransitiveProducerSet(outputName));
 		}
-		return new FlowGraph<Node>(subgraphNodes);
+		return new Graph<Node>(subgraphNodes);
 	}
 
 	private void init() {
@@ -202,46 +202,46 @@ public class FlowGraph<Node extends FlowNode> {
 	private void checkCycles() {
 		GraphSort.sort(this);
 	}
-	
-	private static final class GraphSort<T extends FlowNode> {
-		
-		public static <E extends FlowNode> List<E> sort(final FlowGraph<E> system) {
+
+	private static final class GraphSort<T extends GraphNode> {
+
+		public static <E extends GraphNode> List<E> sort(final Graph<E> system) {
 			return new GraphSort<E>(system).sortInternal();
 		}
-		
+
 		private final List<T> schedule = Lists.newArrayList();
 		private final Map<T,Void> scheduling = Maps.newIdentityHashMap();
 		private final Map<T,Void> scheduled = Maps.newIdentityHashMap();
-		
-		private final FlowGraph<T> sys;
-		
-		private GraphSort(final FlowGraph<T> sys) {
+
+		private final Graph<T> sys;
+
+		private GraphSort(final Graph<T> sys) {
 			this.sys = sys;
 		}
-		
+
 		private List<T> sortInternal() {
 			for (final T op : sys.getAllNodes()) {
 				scheduleInternal(op);
 			}
 			return schedule;
 		}
-	
+
 		private void scheduleInternal(final T op) {
 			if (scheduled.containsKey(op)) {
 				return;
 			}
-			
+
 			if (scheduling.containsKey(op)) {
 				throw new CyclicDependencyException();
 			}
-			
+
 			try {
 				scheduling.put(op, null);
-				
+
 				for (final T pred : sys.getDirectPredecessors(op)) {
 					scheduleInternal(pred);
 				}
-				
+
 				schedule.add(op);
 				scheduled.put(op, null);
 			} finally {

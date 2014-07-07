@@ -1,4 +1,4 @@
-package msdingfield.easyflow.support;
+package msdingfield.easyflow.graph.support;
 
 /** Exception thrown if a cyclic dependency is detected. */
 public class CyclicDependencyException extends RuntimeException {

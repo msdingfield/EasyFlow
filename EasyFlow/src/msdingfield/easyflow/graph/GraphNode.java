@@ -11,7 +11,7 @@ import java.util.Set;
  * @author Matt
  *
  */
-public interface FlowNode {
+public interface GraphNode {
 
 	Set<String> getOutputs();
 	

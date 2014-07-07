@@ -1,6 +1,7 @@
 package msdingfield.easyflow.reflect;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
@@ -18,6 +19,14 @@ public class Context {
 	 */
 	private final Map<String, Object> edgeValues = Maps.newConcurrentMap();
 	private final Map<Object, Object> stateMap = Maps.newConcurrentMap();
+
+	public Context() {
+
+	}
+
+	public Context(final Map<String, Object> params) {
+		edgeValues.putAll(params);
+	}
 
 	public void setEdgeValue(final String key, final Object value) {
 		edgeValues.put(key, value);
@@ -87,6 +96,10 @@ public class Context {
 			return false;
 		}
 		return true;
+	}
+
+	public Set<String> getEdgeKeys() {
+		return edgeValues.keySet();
 	}
 
 }

@@ -1,9 +1,9 @@
 package msdingfield.easyflow.reflect;
 
+import msdingfield.easyflow.annotations.Activity;
 import msdingfield.easyflow.annotations.Operation;
-import msdingfield.easyflow.annotations.Scope;
 
-@Scope("cpScanTestB")
+@Activity(graph = "cpScanTestB")
 public class CpScanTestTopLevelOpB {
 	@Operation
 	public void op() {

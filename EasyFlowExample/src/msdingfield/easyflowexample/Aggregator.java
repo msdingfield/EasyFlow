@@ -5,15 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 import msdingfield.easyflow.EasyFlow;
+import msdingfield.easyflow.FlowEvaluation;
+import msdingfield.easyflow.FlowGraph;
+import msdingfield.easyflow.annotations.Activity;
 import msdingfield.easyflow.annotations.ForkOn;
 import msdingfield.easyflow.annotations.Input;
 import msdingfield.easyflow.annotations.Operation;
 import msdingfield.easyflow.annotations.Output;
-import msdingfield.easyflow.annotations.Scope;
 import msdingfield.easyflow.execution.Task;
-import msdingfield.easyflow.graph.FlowGraph;
-import msdingfield.easyflow.reflect.ClassOperationFlowNode;
-import msdingfield.easyflow.reflect.Context;
 import msdingfield.easyflowexample.dal.LastViewedDao;
 import msdingfield.easyflowexample.dal.PortfolioDao;
 import msdingfield.easyflowexample.dal.StockQuoteDao;
@@ -25,7 +24,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 public class Aggregator {
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class GetPortfolio {
 
 		private final PortfolioDao dao = new PortfolioDao();
@@ -42,7 +41,7 @@ public class Aggregator {
 		}
 	}
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class GetPortfolioQuotes {
 		private final StockQuoteDao dao = new StockQuoteDao();
 
@@ -59,7 +58,7 @@ public class Aggregator {
 		}
 	}
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class GetBalance {
 		private final PortfolioDao dao = new PortfolioDao();
 
@@ -89,7 +88,7 @@ public class Aggregator {
 		}
 	}
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class GetLastViewed {
 		private final LastViewedDao dao = new LastViewedDao();
 
@@ -105,7 +104,7 @@ public class Aggregator {
 		}
 	}
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class GetLastViewedQuotes {
 		private final StockQuoteDao dao = new StockQuoteDao();
 
@@ -122,7 +121,7 @@ public class Aggregator {
 		}
 	}
 
-	@Scope("equities")
+	@Activity(graph="equities")
 	public static class DisplayAll {
 
 		@Input
@@ -192,10 +191,10 @@ public class Aggregator {
 	}
 
 	public static void show(final String clientId) throws InterruptedException {
-		final FlowGraph<ClassOperationFlowNode> system = EasyFlow.loadFlowGraph("msdingfield.easyflowexample", "equities");
-		final Context context = new Context();
-		context.setEdgeValue("clientId", clientId);
-		final Task task = EasyFlow.evaluate(system, context);
+		final FlowGraph graph = EasyFlow.loadFlowGraph("msdingfield.easyflowexample", "equities");
+		final Map<String, Object> params = Maps.newHashMap();
+		params.put("clientId", clientId);
+		final FlowEvaluation task = graph.evaluate(params);
 		task.join();
 	}
 }

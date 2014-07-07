@@ -3,7 +3,7 @@ package msdingfield.easyflow.reflect;
 import java.util.List;
 import java.util.Set;
 
-import msdingfield.easyflow.graph.FlowNode;
+import msdingfield.easyflow.graph.GraphNode;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -18,7 +18,7 @@ import com.google.common.collect.Sets;
  * @author Matt
  *
  */
-public class ClassOperationFlowNode implements FlowNode {
+public class ClassOperationFlowNode implements GraphNode {
 	private final ClassOperation op;
 
 	public static ClassOperationFlowNode toFlowNode(final ClassOperation op) {

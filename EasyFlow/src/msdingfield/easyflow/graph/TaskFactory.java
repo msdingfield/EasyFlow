@@ -5,7 +5,7 @@ import java.util.concurrent.Executor;
 import msdingfield.easyflow.execution.Task;
 
 /** Factory for creating Task instances for FlowNode instances. */
-public interface TaskFactory<T extends FlowNode> {
+public interface TaskFactory<T extends GraphNode> {
 	
 	/**
 	 * Create a Task instance which corresponds to the given FlowNode.  The 

@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @RunWith(Parameterized.class)
-public class TwoNodeFlowGraphTest extends FlowGraphTestBase {
+public class TwoNodeGraphTest extends GraphTestBase {
 
 	@Parameters
 	public static Collection<Object[]> parameters() {
@@ -126,7 +126,7 @@ public class TwoNodeFlowGraphTest extends FlowGraphTestBase {
 	
 	@Test
 	public void testSubGraphForEmptyOutputSet() {
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
 		assertTrue(subgraph.getAllNodes().isEmpty());
 	}
 	
@@ -138,14 +138,14 @@ public class TwoNodeFlowGraphTest extends FlowGraphTestBase {
 	
 	@Test
 	public void testSubGraphForOutputWithOneInputNode() {
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("aout"));
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("aout"));
 		assertEquals(1, subgraph.getAllNodes().size());
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("a")));
 	}
 
 	@Test
 	public void testSubGraphForTwoOutputs() {
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("aout", "bout"));
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("aout", "bout"));
 		assertEquals(2, subgraph.getAllNodes().size());
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("a")));
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("b")));
@@ -155,7 +155,7 @@ public class TwoNodeFlowGraphTest extends FlowGraphTestBase {
 	public void testSubGraphForOutputWithTwoInputNodes() {
 		assumeTrue(isConnectedGraph());
 		
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("bout"));
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("bout"));
 		assertEquals(2, subgraph.getAllNodes().size());
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("a")));
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("b")));

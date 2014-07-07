@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-public class DiamondFlowGraphTest extends FlowGraphTestBase {
+public class DiamondGraphTest extends GraphTestBase {
 
 	@Override
 	Set<TestNode> nodeSet() {
@@ -50,7 +50,7 @@ public class DiamondFlowGraphTest extends FlowGraphTestBase {
 
 	@Test
 	public void testSubGraph() throws InterruptedException, ExecutionException {
-		final FlowGraph<TestNode> partial = graph.getSubGraphForOutputs(Sets.newHashSet("b1-out", "a-out"));
+		final Graph<TestNode> partial = graph.getSubGraphForOutputs(Sets.newHashSet("b1-out", "a-out"));
 
 		final Collection<TestNode> allOperations = partial.getAllNodes();
 		assertEquals(2, allOperations.size());

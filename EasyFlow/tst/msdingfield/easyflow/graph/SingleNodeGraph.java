@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @RunWith(Parameterized.class)
-public class SingleNodeFlowGraph extends FlowGraphTestBase {
+public class SingleNodeGraph extends GraphTestBase {
 	
 	@Parameters
 	public static Collection<Object[]> parameters() {
@@ -115,7 +115,7 @@ public class SingleNodeFlowGraph extends FlowGraphTestBase {
 	
 	@Test
 	public void testGetSubGraphForEmptyOutputSet() {
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
 		assertTrue(subgraph.getAllNodes().isEmpty());
 	}
 	
@@ -128,7 +128,7 @@ public class SingleNodeFlowGraph extends FlowGraphTestBase {
 	@Test
 	public void testGetSubGraphForKnownOutput() {
 		assumeTrue(node.getOutputs().contains("out"));
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("out"));
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet("out"));
 		assertEquals(1, subgraph.getAllNodes().size());
 		assertTrue(subgraph.getAllNodes().contains(new TestNode("a")));
 	}

@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-public class TestNode implements FlowNode {
+public class TestNode implements GraphNode {
 
 	private String name = null;
 	private Set<String> outputs = Sets.newHashSet();

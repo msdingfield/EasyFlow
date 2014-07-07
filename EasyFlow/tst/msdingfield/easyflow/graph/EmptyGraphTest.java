@@ -16,7 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.Sets;
 
-public class EmptyFlowGraphTest extends FlowGraphTestBase {
+public class EmptyGraphTest extends GraphTestBase {
 	
 	@Parameters
 	public static Collection<Object[]> parameters() {
@@ -36,7 +36,7 @@ public class EmptyFlowGraphTest extends FlowGraphTestBase {
 	
 	@Test
 	public void testConstructGraph() {
-		new FlowGraph<TestNode>(nodeSet());
+		new Graph<TestNode>(nodeSet());
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class EmptyFlowGraphTest extends FlowGraphTestBase {
 	
 	@Test
 	public void testGetSubGraphForEmptyOutputSet() {
-		final FlowGraph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
+		final Graph<TestNode> subgraph = graph.getSubGraphForOutputs(Sets.<String>newHashSet());
 		assertTrue(subgraph.getAllNodes().isEmpty());
 	}
 

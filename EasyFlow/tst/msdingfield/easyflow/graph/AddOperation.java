@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
  * @author Matt
  *
  */
-public final class AddOperation implements FlowNode {
+public final class AddOperation implements GraphNode {
 	private final String name;
 	private final int constant;
 

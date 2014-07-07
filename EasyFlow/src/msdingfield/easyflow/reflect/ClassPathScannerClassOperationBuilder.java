@@ -5,8 +5,8 @@ import java.lang.reflect.Modifier;
 import java.net.URLClassLoader;
 import java.util.List;
 
+import msdingfield.easyflow.annotations.Activity;
 import msdingfield.easyflow.annotations.Operation;
-import msdingfield.easyflow.annotations.Scope;
 
 import com.google.common.collect.Lists;
 
@@ -65,12 +65,12 @@ public class ClassPathScannerClassOperationBuilder {
 			return true;
 		}
 
-		if (!type.isAnnotationPresent(Scope.class)) {
+		if (!type.isAnnotationPresent(Activity.class)) {
 			return false;
 		}
 
-		final Scope scopeAnnotation = type.getAnnotation(Scope.class);
-		if (scope.equals(scopeAnnotation.value())) {
+		final Activity scopeAnnotation = type.getAnnotation(Activity.class);
+		if (scope.equals(scopeAnnotation.graph())) {
 			return true;
 		}
 
