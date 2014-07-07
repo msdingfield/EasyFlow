@@ -3,5 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tst"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Matt/Documents/GitHub/EasyFlow/guava-16.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Matt/Documents/GitHub/EasyFlow/jmock-2.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Matt/Documents/GitHub/EasyFlow/jmock-junit4-2.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
