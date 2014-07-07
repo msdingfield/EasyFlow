@@ -178,6 +178,55 @@
  * and collects them into a collection named "results" which is given to the
  * ConsumeResult operation.
  * 
+ * It is possible to explicitly invoke parallel operations like this
+ * 
+ * @Activity(graph = "morestuff")
+ * public class ExplicitParallel {
+ * 
+ *     @Output
+ *     public volatile int valueOne;
+ * 
+ *     @Output
+ *     public volatile int valueTwo;
+ * 
+ *     // Explicitly run two expensive operations in parallel
+ *     @Operation
+ *     public void enact() {
+ *         Task.fork( new Runnable() {
+ *             @Override public void run() {
+ *                 valueOne = expensiveOperation();
+ *             }
+ *         } );
+ * 
+ *         Task.fork( new Runnable() {
+ *             @Override public void run() {
+ *                 valueTwo = expensiveOperation();
+ *         } );
+ *     }
+ * 
+ * }
+ * 
+ * Now, any operations which consume "valueOne" or "valueTwo" will not begin
+ * until both of the "expensive operations" in the task have completed.  A
+ * small variation is to invoke a Runnable when a ListenableFuture<> completes.
+ * This is similar to a normal callback on a ListenableFuture<> except that the
+ * framework will not start any downstream tasks until the future is done and
+ * the callback executes.
+ * 
+ * @Activity(graph = "future")
+ * public class ForkOnFuture {
+ * 
+ *     @Output
+ *     public volatile String result;
+ * 
+ *     @Operation
+ *     public void enact() {
+ *         final ListenableFuture<String> future = callRemoteService();
+ *         Task.fork(future, new Runnable() {
+ *             result = future.get(); // We know this won't block
+ *         });
+ *     }
+ * 
  */
 package msdingfield.easyflow;
 
