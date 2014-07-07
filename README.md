@@ -14,7 +14,8 @@ In addition, it can automatically fork on a collection of values.  After each it
 
 The graph is defined statically in Java code using annotations.  A class defines a node with inputs and outputs describing the connections among nodes.
 
-Example
+Example: Simple Process
+-----------------------
 
     @Activity(graph = "calculate")
     class ModuloDivision {
@@ -95,7 +96,8 @@ To use the graph above, simply evaluate it with the following.
         System.err.printf("Calculation failed with %s\n", evaluation.getErrors());
     }
 
-Asynchronous IO Operations Example
+Example: Asynchronous IO Operations
+-----------------------------------
 
 Working with asynchronous operations which return ListenableFutures can be called like this
 
@@ -163,6 +165,9 @@ Multiple invocations to the remote service can even be done in parallel.
     }
 
 In the example above, the input consists of a collection of query strings. An instance of InvokeService is created and run for each one to run in parallel.  The framework then waits for all of the results to be available and collects them into a collection named "results" which is given to the ConsumeResult operation.
+
+Example: Explicit Parallel Operations
+-------------------------------------
 
 It is possible to explicitly invoke parallel operations like this
 
